@@ -1,0 +1,6 @@
+{
+  "name": "The Sanctuary",
+  "description": "An intimate digital sanctuary and romantic shared journal for Sofs & Mumu.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
