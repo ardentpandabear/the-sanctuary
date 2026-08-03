@@ -102,38 +102,47 @@ export const initialChapters: Chapter[] = [
 export const initialCalendarEvents: CalendarEvent[] = [
   {
     id: 'ev-1',
-    title: 'Our 3rd Anniversary Trip',
-    date: '2025-10-14',
-    time: '10:00 AM',
-    category: 'anniversary',
-    notes: 'Flight booked to Kyoto! Looking forward to autumn leaves.',
-    isCompleted: false
-  },
-  {
-    id: 'ev-2',
     title: 'FaceTime Candlelight Dinner Date',
-    date: '2025-08-15',
+    date: '2026-08-15',
     time: '8:00 PM',
     category: 'date-night',
     notes: 'We both order Italian food and light jasmine candles.',
     isCompleted: false
   },
   {
+    id: 'ev-2',
+    title: 'Sofs & Mumu Reunion Flight',
+    date: '2026-08-28',
+    time: '02:30 PM',
+    category: 'travel',
+    notes: 'LHR to JFK flight arriving in New York for 2 weeks together!',
+    isCompleted: false
+  },
+  {
     id: 'ev-3',
-    title: 'First Day of Ramadan',
-    date: '2026-02-18',
-    category: 'faith',
-    hijriDate: '1 Ramadan 1447',
-    notes: 'Shared Suhoor video call & daily Juz reading schedule.',
+    title: 'Mumu’s Birthday Surprise',
+    date: '2026-09-24',
+    time: '12:00 AM',
+    category: 'special',
+    notes: 'Special care package with handwritten letters arriving in NY.',
     isCompleted: false
   },
   {
     id: 'ev-4',
-    title: 'Mumu’s Birthday Surprise',
-    date: '2025-09-24',
-    time: '12:00 AM',
-    category: 'special',
-    notes: 'Special care package with handwritten letters arriving in NY.',
+    title: 'Our 3rd Anniversary Trip to Kyoto',
+    date: '2026-10-14',
+    time: '10:00 AM',
+    category: 'anniversary',
+    notes: 'Flight booked to Kyoto! Looking forward to autumn leaves.',
+    isCompleted: false
+  },
+  {
+    id: 'ev-5',
+    title: 'First Day of Ramadan',
+    date: '2027-03-09',
+    category: 'faith',
+    hijriDate: '1 Ramadan 1448',
+    notes: 'Shared Suhoor video call & daily Juz reading schedule.',
     isCompleted: false
   }
 ];
@@ -811,4 +820,3 @@ export const initialDailyLetters: DailyLetter[] = [
     fontStyle: 'serif'
   }
 ];
-

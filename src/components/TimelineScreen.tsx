@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Clock, Plus, MapPin, Calendar, Heart, Sparkles, Filter, Trash2 } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Clock, Plus, MapPin, Calendar, Heart, Sparkles, Filter, Trash2, Upload, Image as ImageIcon } from 'lucide-react';
 import { TimelineMilestone } from '../types';
 
 interface TimelineScreenProps {
@@ -24,6 +24,20 @@ export const TimelineScreen: React.FC<TimelineScreenProps> = ({
   const [category, setCategory] = useState<TimelineMilestone['category']>('milestone');
   const [photoUrl, setPhotoUrl] = useState('');
   const [tag, setTag] = useState('');
+  const photoFileInputRef = useRef<HTMLInputElement>(null);
+
+  const handlePhotoFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setPhotoUrl(event.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const categories = ['All', 'firsts', 'travel', 'milestone', 'celebration', 'life'];
 
@@ -210,14 +224,37 @@ export const TimelineScreen: React.FC<TimelineScreenProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-[#a39780] mb-1">Photo URL (Optional)</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-medium text-[#a39780]">Milestone Photo</label>
+                  <button
+                    type="button"
+                    onClick={() => photoFileInputRef.current?.click()}
+                    className="text-[11px] text-[#d4af37] hover:underline flex items-center space-x-1 cursor-pointer font-medium"
+                  >
+                    <Upload className="w-3 h-3" />
+                    <span>Upload from Gallery / Device</span>
+                  </button>
+                  <input
+                    type="file"
+                    ref={photoFileInputRef}
+                    onChange={handlePhotoFileUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                </div>
                 <input
-                  type="url"
+                  type="text"
                   value={photoUrl}
                   onChange={(e) => setPhotoUrl(e.target.value)}
-                  placeholder="https://images.unsplash.com/..."
+                  placeholder="Paste Image URL or click 'Upload from Gallery'"
                   className="w-full px-3 py-2 rounded-xl bg-[#0e1017] border border-[#d4af37]/30 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#d4af37]"
                 />
+                {photoUrl && photoUrl.startsWith('data:image') && (
+                  <p className="text-[10px] text-emerald-400 font-mono mt-1 flex items-center space-x-1">
+                    <ImageIcon className="w-3 h-3 text-emerald-400" />
+                    <span>✓ Photo loaded from gallery</span>
+                  </p>
+                )}
               </div>
 
               <div>

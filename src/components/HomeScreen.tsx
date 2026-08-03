@@ -38,16 +38,29 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   const [isPlayingSong, setIsPlayingSong] = useState(false);
   const [showMemoryModal, setShowMemoryModal] = useState(false);
 
-  // Calculate dynamic days since October 14, 2021
-  const firstMetDate = new Date('2021-10-14');
+  // Calculate dynamic days since June 5, 2026
+  const firstMetDate = new Date('2026-06-05');
   const now = new Date();
   const diffTime = Math.abs(now.getTime() - firstMetDate.getTime());
   const daysTogether = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  // Next Anniversary Oct 14
-  const nextAnniv = new Date(now.getFullYear(), 9, 14);
+  // Next Anniversary Jun 5
+  const nextAnniv = new Date(now.getFullYear(), 5, 5);
   if (now > nextAnniv) nextAnniv.setFullYear(now.getFullYear() + 1);
   const daysToAnniv = Math.ceil((nextAnniv.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+  // Calculate days until next Nov 7
+const today = new Date();
+
+let nextBirthday = new Date(today.getFullYear(), 10, 7); // Month is 0-indexed, so 10 = November
+
+// If this year's birthday has already passed, use next year's
+if (today > nextBirthday) {
+  nextBirthday = new Date(today.getFullYear() + 1, 10, 7);
+}
+
+const diffTime = nextBirthday - today;
+const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
   return (
     <div className="space-y-8 pb-12 animate-fade-in">
@@ -104,7 +117,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             <div className="text-2xl sm:text-3xl font-display font-bold text-[#fff8e7]">
               {daysTogether.toLocaleString()} <span className="text-sm font-sans font-normal text-[#d4af37]">Days</span>
             </div>
-            <p className="text-xs text-[#a39780] mt-0.5">Since our first hello in London (Oct 14, 2021)</p>
+            <p className="text-xs text-[#a39780] mt-0.5">Since our first message on Insta (Jun 5, 2026)</p>
           </div>
         </div>
 
@@ -117,23 +130,29 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             <div className="text-2xl sm:text-3xl font-display font-bold text-[#fff8e7]">
               {daysToAnniv} <span className="text-sm font-sans font-normal text-[#d4af37]">Days Away</span>
             </div>
-            <p className="text-xs text-[#a39780] mt-0.5">Next Anniversary (October 14, 2025)</p>
+            <p className="text-xs text-[#a39780] mt-0.5">Next Anniversary (June 5, 2026)</p>
           </div>
         </div>
 
-        {/* Next Meeting */}
-        <div className="glass-panel p-5 rounded-2xl border border-[#d4af37]/20 flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-2xl bg-[#1e1b15] border border-[#d4af37]/40 flex items-center justify-center text-[#d4af37] shadow-md">
-            <Compass className="w-6 h-6 text-[#d4af37]" />
-          </div>
-          <div>
-            <div className="text-2xl sm:text-3xl font-display font-bold text-[#fff8e7]">
-              26 <span className="text-sm font-sans font-normal text-[#d4af37]">Days</span>
-            </div>
-            <p className="text-xs text-[#a39780] mt-0.5">Until London Reunion Flight ✈️</p>
-          </div>
-        </div>
-      </div>
+{/* Next Birthday */}
+<div className="glass-panel p-5 rounded-2xl border border-[#d4af37]/20 flex items-center space-x-4">
+  <div className="w-12 h-12 rounded-2xl bg-[#1e1b15] border border-[#d4af37]/40 flex items-center justify-center text-[#d4af37] shadow-md">
+    <Compass className="w-6 h-6 text-[#d4af37]" />
+  </div>
+
+  <div>
+    <div className="text-2xl sm:text-3xl font-display font-bold text-[#fff8e7]">
+      {daysLeft}{" "}
+      <span className="text-sm font-sans font-normal text-[#d4af37]">
+        {daysLeft === 1 ? "Day" : "Days"}
+      </span>
+    </div>
+
+    <p className="text-xs text-[#a39780] mt-0.5">
+      Until Sof's Birthday 🎂
+    </p>
+  </div>
+</div>
 
       {/* Dual City Time & Temperature Widget (Allahabad & Birmingham) */}
       <CityTimeWeatherWidget />

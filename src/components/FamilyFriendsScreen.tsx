@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Users, Plus, Phone, MapPin, Gift, Heart, Sparkles, Filter, Trash2, HeartHandshake, Home } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Users, Plus, Phone, MapPin, Gift, Heart, Sparkles, Filter, Trash2, HeartHandshake, Home, Upload, Image as ImageIcon } from 'lucide-react';
 import { FamilyFriendContact } from '../types';
 
 interface FamilyFriendsScreenProps {
@@ -23,6 +23,20 @@ export const FamilyFriendsScreen: React.FC<FamilyFriendsScreenProps> = ({
   const [relation, setRelation] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
   const [phone, setPhone] = useState('');
+  const avatarFileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setAvatarUrl(event.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
   const [location, setLocation] = useState('');
   const [birthday, setBirthday] = useState('');
   const [favoriteThingsInput, setFavoriteThingsInput] = useState('');
@@ -441,14 +455,37 @@ export const FamilyFriendsScreen: React.FC<FamilyFriendsScreenProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-[#a39780] mb-1">Avatar Image URL (Optional)</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-medium text-[#a39780]">Avatar Photo</label>
+                  <button
+                    type="button"
+                    onClick={() => avatarFileInputRef.current?.click()}
+                    className="text-[11px] text-[#d4af37] hover:underline flex items-center space-x-1 cursor-pointer font-medium"
+                  >
+                    <Upload className="w-3 h-3" />
+                    <span>Upload from Gallery / Device</span>
+                  </button>
+                  <input
+                    type="file"
+                    ref={avatarFileInputRef}
+                    onChange={handleAvatarFileUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                </div>
                 <input
-                  type="url"
+                  type="text"
                   value={avatarUrl}
                   onChange={(e) => setAvatarUrl(e.target.value)}
-                  placeholder="https://images.unsplash.com/..."
+                  placeholder="Paste Image URL or click 'Upload from Gallery'"
                   className="w-full px-3 py-2 rounded-xl bg-[#0e1017] border border-[#d4af37]/30 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#d4af37]"
                 />
+                {avatarUrl && avatarUrl.startsWith('data:image') && (
+                  <p className="text-[10px] text-emerald-400 font-mono mt-1 flex items-center space-x-1">
+                    <ImageIcon className="w-3 h-3 text-emerald-400" />
+                    <span>✓ Avatar loaded from gallery</span>
+                  </p>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-2">

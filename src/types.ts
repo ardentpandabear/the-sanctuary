@@ -34,6 +34,7 @@ export interface Chapter {
   audioTrackName?: string;
   audioTrackArtist?: string;
   audioTrackUrl?: string;
+  spotifyEmbedUrl?: string;
   author: 'sofs' | 'mumu' | 'both';
 }
 

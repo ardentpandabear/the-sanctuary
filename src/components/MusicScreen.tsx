@@ -1,5 +1,21 @@
 import React, { useState } from 'react';
-import { Music, Play, Pause, Plus, Heart, Sparkles, Filter, Trash2, Volume2, Youtube, ExternalLink, Radio } from 'lucide-react';
+import { 
+  Music, 
+  Play, 
+  Pause, 
+  Plus, 
+  Filter, 
+  Trash2, 
+  Youtube, 
+  ExternalLink, 
+  Radio,
+  Wand2,
+  Loader2,
+  Check,
+  Link as LinkIcon,
+  Upload,
+  Image as ImageIcon
+} from 'lucide-react';
 import { Song } from '../types';
 
 interface MusicScreenProps {
@@ -8,7 +24,7 @@ interface MusicScreenProps {
   onDeleteSong: (id: string) => void;
 }
 
-// Helpers to extract embed URLs for YouTube and Spotify
+// Helpers to extract embed URLs and metadata for YouTube and Spotify
 const parseYouTubeEmbed = (url: string): string => {
   let videoId = '';
   if (url.includes('youtu.be/')) {
@@ -38,6 +54,102 @@ const parseSpotifyEmbed = (url: string): string => {
   return trackId ? `https://open.spotify.com/embed/track/${trackId}?utm_source=generator&theme=0` : url;
 };
 
+// Auto-fetch song metadata from Spotify or YouTube via public oEmbed endpoints
+export const fetchSongMetadata = async (url: string) => {
+  const cleanUrl = url.trim();
+  if (!cleanUrl) return null;
+
+  const isSpotify = cleanUrl.includes('spotify.com') || cleanUrl.includes('spotify:track:');
+  const isYouTube = cleanUrl.includes('youtube.com') || cleanUrl.includes('youtu.be');
+
+  if (isSpotify) {
+    let trackId = '';
+    const match = cleanUrl.match(/track[\/:]([a-zA-Z0-9]+)/);
+    if (match) {
+      trackId = match[1];
+    }
+
+    try {
+      const oembedUrl = `https://open.spotify.com/oembed?url=${encodeURIComponent(cleanUrl)}`;
+      const res = await fetch(oembedUrl);
+      if (res.ok) {
+        const data = await res.json();
+        return {
+          title: data.title || '',
+          artist: data.author_name || 'Unknown Artist',
+          album: 'Spotify Single',
+          coverUrl: data.thumbnail_url || 'https://images.unsplash.com/photo-1614680376593-902f749f705b?auto=format&fit=crop&q=80&w=400',
+          embedUrl: trackId ? `https://open.spotify.com/embed/track/${trackId}?utm_source=generator&theme=0` : cleanUrl,
+          sourceType: 'spotify' as const,
+          sourceUrl: cleanUrl,
+          moodTags: ['Romantic', 'Spotify Favorite', 'Our Track']
+        };
+      }
+    } catch (e) {
+      console.warn("Spotify oEmbed fetch error, falling back:", e);
+    }
+
+    // Fallback if oembed fails or blocked
+    return {
+      title: trackId ? `Track (${trackId.slice(0, 6)})` : 'Spotify Song',
+      artist: 'Spotify Artist',
+      album: 'Spotify Track',
+      coverUrl: 'https://images.unsplash.com/photo-1614680376593-902f749f705b?auto=format&fit=crop&q=80&w=400',
+      embedUrl: trackId ? `https://open.spotify.com/embed/track/${trackId}?utm_source=generator&theme=0` : cleanUrl,
+      sourceType: 'spotify' as const,
+      sourceUrl: cleanUrl,
+      moodTags: ['Spotify Favorite', 'Romantic']
+    };
+  }
+
+  if (isYouTube) {
+    let videoId = '';
+    if (cleanUrl.includes('youtu.be/')) {
+      videoId = cleanUrl.split('youtu.be/')[1]?.split('?')[0] || '';
+    } else if (cleanUrl.includes('youtube.com/watch')) {
+      try {
+        const searchParams = new URLSearchParams(cleanUrl.split('?')[1]);
+        videoId = searchParams.get('v') || '';
+      } catch (e) {
+        videoId = '';
+      }
+    }
+
+    try {
+      const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(cleanUrl)}&format=json`;
+      const res = await fetch(oembedUrl);
+      if (res.ok) {
+        const data = await res.json();
+        return {
+          title: data.title || 'YouTube Song',
+          artist: data.author_name || 'YouTube Creator',
+          album: 'YouTube Release',
+          coverUrl: videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : data.thumbnail_url || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=400',
+          embedUrl: videoId ? `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1` : cleanUrl,
+          sourceType: 'youtube' as const,
+          sourceUrl: cleanUrl,
+          moodTags: ['YouTube', 'Music Video', 'Romantic']
+        };
+      }
+    } catch (e) {
+      console.warn("YouTube oEmbed fetch error, falling back:", e);
+    }
+
+    return {
+      title: 'YouTube Track',
+      artist: 'YouTube Artist',
+      album: 'Video Track',
+      coverUrl: videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=400',
+      embedUrl: videoId ? `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1` : cleanUrl,
+      sourceType: 'youtube' as const,
+      sourceUrl: cleanUrl,
+      moodTags: ['YouTube', 'Melody']
+    };
+  }
+
+  return null;
+};
+
 export const MusicScreen: React.FC<MusicScreenProps> = ({
   songs,
   onAddSong,
@@ -48,16 +160,38 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({
   const [selectedMood, setSelectedMood] = useState<string>('All');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
+  // Quick Auto-Import Bar State
+  const [quickUrl, setQuickUrl] = useState('');
+  const [isQuickFetching, setIsQuickFetching] = useState(false);
+  const [quickSuccessMsg, setQuickSuccessMsg] = useState('');
+
   // Add Song Form State
   const [title, setTitle] = useState('');
   const [artist, setArtist] = useState('');
   const [album, setAlbum] = useState('');
-  const [sourceType, setSourceType] = useState<'youtube' | 'spotify' | 'custom'>('youtube');
+  const [sourceType, setSourceType] = useState<'youtube' | 'spotify' | 'custom'>('spotify');
   const [sourceUrl, setSourceUrl] = useState('');
   const [coverUrl, setCoverUrl] = useState('');
   const [moodTags, setMoodTags] = useState('');
   const [storyNote, setStoryNote] = useState('');
   const [addedBy, setAddedBy] = useState<'sofs' | 'mumu'>('sofs');
+  const coverFileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleCoverFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setCoverUrl(event.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const [isModalFetching, setIsModalFetching] = useState(false);
+  const [modalAutoFilledStatus, setModalAutoFilledStatus] = useState<string | null>(null);
 
   const allMoods = ['All', ...Array.from(new Set(songs.flatMap(s => s.moodTags)))];
 
@@ -73,6 +207,73 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({
     } else {
       setActiveSongId(id);
       setIsPlaying(true);
+    }
+  };
+
+  // Quick Auto-Import handler from top bar
+  const handleQuickImport = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!quickUrl.trim()) return;
+
+    setIsQuickFetching(true);
+    setQuickSuccessMsg('');
+
+    try {
+      const meta = await fetchSongMetadata(quickUrl);
+      if (meta) {
+        onAddSong({
+          title: meta.title,
+          artist: meta.artist,
+          album: meta.album,
+          coverUrl: meta.coverUrl,
+          addedBy: 'sofs',
+          moodTags: meta.moodTags,
+          duration: '3:30',
+          sourceType: meta.sourceType,
+          sourceUrl: meta.sourceUrl,
+          embedUrl: meta.embedUrl,
+          storyNote: 'Added via Spotify auto-import.',
+          addedDate: new Date().toISOString().split('T')[0]
+        });
+
+        setQuickSuccessMsg(`✨ Successfully added "${meta.title}" by ${meta.artist}!`);
+        setQuickUrl('');
+        setTimeout(() => setQuickSuccessMsg(''), 4000);
+      } else {
+        // Fallback manually if unknown URL
+        setIsAddModalOpen(true);
+        setSourceUrl(quickUrl);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsQuickFetching(false);
+    }
+  };
+
+  // Auto-fetch trigger in Modal when user pastes/types a URL
+  const handleFetchModalMetadata = async (urlToFetch?: string) => {
+    const targetUrl = urlToFetch || sourceUrl;
+    if (!targetUrl.trim()) return;
+
+    setIsModalFetching(true);
+    setModalAutoFilledStatus(null);
+
+    try {
+      const meta = await fetchSongMetadata(targetUrl);
+      if (meta) {
+        setTitle(meta.title);
+        setArtist(meta.artist);
+        setAlbum(meta.album);
+        setCoverUrl(meta.coverUrl);
+        setSourceType(meta.sourceType);
+        setMoodTags(meta.moodTags.join(', '));
+        setModalAutoFilledStatus(`✨ Auto-fetched details for "${meta.title}" from ${meta.sourceType === 'spotify' ? 'Spotify' : 'YouTube'}!`);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsModalFetching(false);
     }
   };
 
@@ -109,7 +310,9 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({
     setAlbum('');
     setSourceUrl('');
     setCoverUrl('');
+    setMoodTags('');
     setStoryNote('');
+    setModalAutoFilledStatus(null);
     setIsAddModalOpen(false);
   };
 
@@ -147,7 +350,7 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({
           </div>
           <h2 className="text-2xl sm:text-3xl font-display font-semibold text-[#fff8e7]">Music Library</h2>
           <p className="text-xs sm:text-sm font-serif italic text-[#c8bfab]">
-            Listen to our favorite melodies with YouTube &amp; Spotify embeds. Press play and drift back to Allahabad &amp; Birmingham.
+            Paste any Spotify track URL or YouTube link. Song name, artist, album art, and mood tags are automatically detected and added!
           </p>
         </div>
 
@@ -156,8 +359,60 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({
           className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#d4af37] via-[#e5c158] to-[#aa8022] text-[#0c0d12] font-semibold text-xs tracking-wider hover:brightness-110 transition shadow-lg shadow-[#d4af37]/20 flex items-center space-x-2 cursor-pointer shrink-0"
         >
           <Plus className="w-4 h-4" />
-          <span>Add Song (YouTube / Spotify)</span>
+          <span>Add Song Manually</span>
         </button>
+      </div>
+
+      {/* Quick Spotify URL Auto-Import Bar */}
+      <div className="p-5 rounded-3xl bg-gradient-to-r from-[#0d1f18]/90 via-[#121620]/90 to-[#1b1712]/90 border border-emerald-500/30 shadow-xl space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Radio className="w-4 h-4 text-emerald-400 animate-pulse" />
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-emerald-300">
+              Quick Spotify Auto-Import
+            </h3>
+          </div>
+          <span className="text-[10px] text-[#8c816d] font-mono">Instant Song Name, Artist &amp; Album Art Extraction</span>
+        </div>
+
+        <form onSubmit={handleQuickImport} className="flex flex-col sm:flex-row items-center gap-2">
+          <div className="relative w-full flex-1">
+            <LinkIcon className="w-4 h-4 text-emerald-400/60 absolute left-3.5 top-3" />
+            <input
+              type="url"
+              required
+              value={quickUrl}
+              onChange={(e) => setQuickUrl(e.target.value)}
+              placeholder="Paste Spotify track link (e.g. https://open.spotify.com/track/...)"
+              className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-[#080a0f] border border-emerald-500/30 text-xs text-[#f3e7c4] focus:outline-none focus:border-emerald-400 placeholder-[#615a4b]"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={isQuickFetching || !quickUrl.trim()}
+            className="w-full sm:w-auto px-6 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-slate-950 font-bold text-xs hover:brightness-110 transition shadow-lg shadow-emerald-950/50 flex items-center justify-center space-x-2 disabled:opacity-50 cursor-pointer shrink-0"
+          >
+            {isQuickFetching ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
+                <span>Auto-Fetching...</span>
+              </>
+            ) : (
+              <>
+                <Wand2 className="w-4 h-4 text-slate-950" />
+                <span>Auto-Import Track</span>
+              </>
+            )}
+          </button>
+        </form>
+
+        {quickSuccessMsg && (
+          <div className="p-3 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-xs font-medium flex items-center space-x-2 animate-fade-in">
+            <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>{quickSuccessMsg}</span>
+          </div>
+        )}
       </div>
 
       {/* Featured Now Playing Bar */}
@@ -309,7 +564,7 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({
                   <p className="text-xs text-[#a39780] truncate">{song.artist}</p>
                   <div className="flex items-center space-x-1">
                     {song.moodTags.map((tag, idx) => (
-                      <span key={idx} className="text-[9px] px-1.5 py-0.2 rounded bg-[#0e1017] text-[#d4af37]">
+                      <span key={idx} className="text-[9px] px-1.5 py-0.5 rounded bg-[#0e1017] text-[#d4af37]">
                         {tag}
                       </span>
                     ))}
@@ -338,7 +593,7 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({
       {/* Add Song Modal */}
       {isAddModalOpen && (
         <div className="fixed inset-0 bg-[#000000]/75 z-50 flex items-center justify-center p-4 backdrop-blur-md">
-          <div className="glass-panel max-w-md w-full p-6 sm:p-8 rounded-3xl border border-[#d4af37]/30 shadow-2xl space-y-4 relative">
+          <div className="glass-panel max-w-md w-full p-6 sm:p-8 rounded-3xl border border-[#d4af37]/30 shadow-2xl space-y-4 relative max-h-[90vh] overflow-y-auto custom-scrollbar">
             <button
               onClick={() => setIsAddModalOpen(false)}
               className="absolute top-4 right-4 text-[#a39780] hover:text-[#f3e7c4] text-xl font-bold cursor-pointer"
@@ -395,14 +650,43 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({
               </div>
 
               {/* Source Link Input */}
-              <div>
-                <label className="block text-xs font-medium text-[#a39780] mb-1">
-                  {sourceType === 'youtube' ? 'YouTube URL or Video Link *' : sourceType === 'spotify' ? 'Spotify Track URL or Embed Link *' : 'Song Link / Audio URL'}
-                </label>
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-medium text-[#a39780]">
+                    {sourceType === 'youtube' ? 'YouTube URL or Video Link *' : sourceType === 'spotify' ? 'Spotify Track URL or Embed Link *' : 'Song Link / Audio URL'}
+                  </label>
+                  {sourceUrl && (
+                    <button
+                      type="button"
+                      onClick={() => handleFetchModalMetadata()}
+                      disabled={isModalFetching}
+                      className="text-[10px] text-emerald-400 hover:underline flex items-center space-x-1 font-semibold cursor-pointer disabled:opacity-50"
+                    >
+                      {isModalFetching ? (
+                        <>
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                          <span>Fetching...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Wand2 className="w-3 h-3 text-emerald-400" />
+                          <span>Auto-Fetch Details</span>
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
+
                 <input
                   type="url"
                   value={sourceUrl}
-                  onChange={(e) => setSourceUrl(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSourceUrl(val);
+                    if (val.includes('spotify.com/track') || val.includes('youtube.com/watch') || val.includes('youtu.be')) {
+                      handleFetchModalMetadata(val);
+                    }
+                  }}
                   placeholder={
                     sourceType === 'youtube' 
                       ? 'https://www.youtube.com/watch?v=...' 
@@ -412,6 +696,13 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({
                   }
                   className="w-full px-3 py-2 rounded-xl bg-[#0e1017] border border-[#d4af37]/30 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#d4af37]"
                 />
+
+                {modalAutoFilledStatus && (
+                  <p className="text-[10px] text-emerald-400 font-medium flex items-center space-x-1">
+                    <Check className="w-3 h-3 text-emerald-400" />
+                    <span>{modalAutoFilledStatus}</span>
+                  </p>
+                )}
               </div>
 
               <div>
@@ -439,14 +730,37 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-[#a39780] mb-1">Cover Artwork Image URL</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-medium text-[#a39780]">Cover Artwork</label>
+                  <button
+                    type="button"
+                    onClick={() => coverFileInputRef.current?.click()}
+                    className="text-[11px] text-[#d4af37] hover:underline flex items-center space-x-1 cursor-pointer font-medium"
+                  >
+                    <Upload className="w-3 h-3" />
+                    <span>Upload from Gallery / Device</span>
+                  </button>
+                  <input
+                    type="file"
+                    ref={coverFileInputRef}
+                    onChange={handleCoverFileUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                </div>
                 <input
-                  type="url"
+                  type="text"
                   value={coverUrl}
                   onChange={(e) => setCoverUrl(e.target.value)}
-                  placeholder="https://images.unsplash.com/..."
+                  placeholder="Paste Image URL or click 'Upload from Gallery'"
                   className="w-full px-3 py-2 rounded-xl bg-[#0e1017] border border-[#d4af37]/30 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#d4af37]"
                 />
+                {coverUrl && coverUrl.startsWith('data:image') && (
+                  <p className="text-[10px] text-emerald-400 font-mono mt-1 flex items-center space-x-1">
+                    <ImageIcon className="w-3 h-3 text-emerald-400" />
+                    <span>✓ Artwork loaded from gallery</span>
+                  </p>
+                )}
               </div>
 
               <div>

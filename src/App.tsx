@@ -254,6 +254,12 @@ export default function App() {
     upsertTableItem('chapters', chapter);
   };
 
+  const handleUpdateChapter = (id: string, updated: Omit<Chapter, 'id'>) => {
+    const chapter = { ...updated, id };
+    setChapters(chapters.map(c => c.id === id ? chapter : c));
+    upsertTableItem('chapters', chapter);
+  };
+
   const handleDeleteChapter = (id: string) => {
     setChapters(chapters.filter(c => c.id !== id));
     deleteTableItem('chapters', id);
@@ -263,6 +269,17 @@ export default function App() {
     const ev: CalendarEvent = { ...newEvent, id: `ev-${Date.now()}` };
     setCalendarEvents([...calendarEvents, ev]);
     upsertTableItem('calendar_events', ev);
+  };
+
+  const handleUpdateCalendarEvent = (id: string, updated: Omit<CalendarEvent, 'id'>) => {
+    const ev = { ...updated, id };
+    setCalendarEvents(calendarEvents.map(e => e.id === id ? ev : e));
+    upsertTableItem('calendar_events', ev);
+  };
+
+  const handleDeleteCalendarEvent = (id: string) => {
+    setCalendarEvents(calendarEvents.filter(e => e.id !== id));
+    deleteTableItem('calendar_events', id);
   };
 
   const handleToggleEventCompleted = (id: string) => {
@@ -513,6 +530,7 @@ export default function App() {
             <OurStoryScreen
               chapters={chapters}
               onAddChapter={handleAddChapter}
+              onUpdateChapter={handleUpdateChapter}
               onDeleteChapter={handleDeleteChapter}
               isAddModalOpen={isAddChapterModalOpen}
               setIsAddModalOpen={setIsAddChapterModalOpen}
@@ -524,6 +542,8 @@ export default function App() {
               events={calendarEvents}
               countdowns={initialCountdowns}
               onAddEvent={handleAddCalendarEvent}
+              onUpdateEvent={handleUpdateCalendarEvent}
+              onDeleteEvent={handleDeleteCalendarEvent}
               onToggleEventCompleted={handleToggleEventCompleted}
             />
           )}

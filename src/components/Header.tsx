@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, Search, Sparkles, Heart, Clock, Globe, Bell, Volume2, Mail } from 'lucide-react';
+import { Menu, Search, Sparkles, Heart, Clock, Globe, Bell, Volume2, Mail, Plus, Trash2, Edit2, Check, X } from 'lucide-react';
 import { ActiveTab, PartnerProfile } from '../types';
+
+const DEFAULT_PRESETS = [
+  '☕ Cozy & Drinking Tea',
+  '❤️ Missing You',
+  '✨ Peaceful & Happy',
+  '📚 Deep in Focus',
+  '🌙 Restful Evening',
+  '✈️ Dreaming of Kyoto'
+];
 
 interface HeaderProps {
   activeTab: ActiveTab;
@@ -25,6 +34,55 @@ export const Header: React.FC<HeaderProps> = ({
   const [nyTime, setNyTime] = useState('');
   const [editingMoodFor, setEditingMoodFor] = useState<'sofs' | 'mumu' | null>(null);
   const [moodInput, setMoodInput] = useState('');
+
+  // Quick Preset Moods State with localStorage persistence
+  const [moodPresets, setMoodPresets] = useState<string[]>(() => {
+    const saved = localStorage.getItem('sanctuary_mood_presets');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return DEFAULT_PRESETS;
+  });
+
+  const [newPresetText, setNewPresetText] = useState('');
+  const [isAddingPreset, setIsAddingPreset] = useState(false);
+  const [editingPresetIdx, setEditingPresetIdx] = useState<number | null>(null);
+  const [editingPresetVal, setEditingPresetVal] = useState('');
+
+  useEffect(() => {
+    localStorage.setItem('sanctuary_mood_presets', JSON.stringify(moodPresets));
+  }, [moodPresets]);
+
+  const handleAddPreset = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPresetText.trim()) return;
+    setMoodPresets(prev => [...prev, newPresetText.trim()]);
+    setNewPresetText('');
+    setIsAddingPreset(false);
+  };
+
+  const handleDeletePreset = (idxToDelete: number) => {
+    setMoodPresets(prev => prev.filter((_, idx) => idx !== idxToDelete));
+  };
+
+  const handleStartEditPreset = (idx: number, val: string) => {
+    setEditingPresetIdx(idx);
+    setEditingPresetVal(val);
+  };
+
+  const handleSaveEditPreset = (idxToSave: number) => {
+    if (!editingPresetVal.trim()) {
+      handleDeletePreset(idxToSave);
+    } else {
+      setMoodPresets(prev => prev.map((p, idx) => idx === idxToSave ? editingPresetVal.trim() : p));
+    }
+    setEditingPresetIdx(null);
+    setEditingPresetVal('');
+  };
 
   useEffect(() => {
     const updateTimes = () => {
@@ -124,28 +182,86 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Partner Avatars & Mood Pill */}
-          <div className="flex items-center space-x-2 sm:space-x-3">
-            {/* Sofs Avatar */}
-            <div className="relative group cursor-pointer" onClick={() => { setEditingMoodFor('sofs'); setMoodInput(profiles.sofs.currentMood || ''); }}>
-              <img
-                src={profiles.sofs.avatar}
-                alt="Sofs"
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-[#d4af37]/50 shadow-md group-hover:scale-105 transition"
-              />
-              <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-[#0c0d12]" title="Connected in London" />
+          {/* Partner Avatars & Mood Tooltips */}
+          <div className="flex items-center space-x-3">
+            {/* Sofs Avatar with Hover Mood Tooltip */}
+            <div className="relative group">
+              <button
+                type="button"
+                onClick={() => { setEditingMoodFor('sofs'); setMoodInput(profiles.sofs.currentMood || ''); }}
+                className="relative block focus:outline-none cursor-pointer"
+                aria-label="Set Sofs's Mood"
+              >
+                <img
+                  src={profiles.sofs.avatar}
+                  alt={profiles.sofs.name}
+                  className="w-10 h-10 rounded-full object-cover border-2 border-[#d4af37]/60 shadow-md group-hover:border-[#d4af37] group-hover:scale-105 transition duration-200"
+                />
+                <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-[#0c0d12]" title={`Location: ${profiles.sofs.location}`} />
+              </button>
+
+              {/* Hover Mood Card Tooltip */}
+              <div className="absolute right-0 top-12 mt-1 hidden group-hover:flex flex-col w-56 p-3 rounded-2xl bg-[#0f1118]/95 border border-[#d4af37]/40 shadow-2xl backdrop-blur-md z-50 animate-fade-in pointer-events-none">
+                <div className="flex items-center justify-between pb-1.5 border-b border-[#d4af37]/15 mb-2">
+                  <span className="text-xs font-display font-semibold text-[#f3e7c4]">{profiles.sofs.name}</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#d4af37]/10 text-[#d4af37] font-mono border border-[#d4af37]/20">
+                    {profiles.sofs.location}
+                  </span>
+                </div>
+                <div className="space-y-1">
+                  <div className="text-[10px] uppercase font-semibold text-[#d4af37] tracking-wider flex items-center space-x-1">
+                    <Sparkles className="w-3 h-3 text-[#d4af37]" />
+                    <span>Current Mood</span>
+                  </div>
+                  <p className="text-xs text-[#f3e7c4] font-serif italic line-clamp-2">
+                    "{profiles.sofs.currentMood || 'Feeling blissful and loved'}"
+                  </p>
+                </div>
+                <div className="mt-2 pt-1.5 border-t border-[#d4af37]/10 text-[9px] text-[#a39780] text-center font-mono">
+                  Click avatar to set mood ✎
+                </div>
+              </div>
             </div>
 
-            <span className="text-[#d4af37]/40 text-xs">&amp;</span>
+            <span className="text-[#d4af37]/50 font-serif italic text-sm">&amp;</span>
 
-            {/* Mumu Avatar */}
-            <div className="relative group cursor-pointer" onClick={() => { setEditingMoodFor('mumu'); setMoodInput(profiles.mumu.currentMood || ''); }}>
-              <img
-                src={profiles.mumu.avatar}
-                alt="Mumu"
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-[#d4af37]/50 shadow-md group-hover:scale-105 transition"
-              />
-              <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-[#0c0d12]" title="Connected in New York" />
+            {/* Mumu Avatar with Hover Mood Tooltip */}
+            <div className="relative group">
+              <button
+                type="button"
+                onClick={() => { setEditingMoodFor('mumu'); setMoodInput(profiles.mumu.currentMood || ''); }}
+                className="relative block focus:outline-none cursor-pointer"
+                aria-label="Set Mumu's Mood"
+              >
+                <img
+                  src={profiles.mumu.avatar}
+                  alt={profiles.mumu.name}
+                  className="w-10 h-10 rounded-full object-cover border-2 border-[#d4af37]/60 shadow-md group-hover:border-[#d4af37] group-hover:scale-105 transition duration-200"
+                />
+                <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-[#0c0d12]" title={`Location: ${profiles.mumu.location}`} />
+              </button>
+
+              {/* Hover Mood Card Tooltip */}
+              <div className="absolute right-0 top-12 mt-1 hidden group-hover:flex flex-col w-56 p-3 rounded-2xl bg-[#0f1118]/95 border border-[#d4af37]/40 shadow-2xl backdrop-blur-md z-50 animate-fade-in pointer-events-none">
+                <div className="flex items-center justify-between pb-1.5 border-b border-[#d4af37]/15 mb-2">
+                  <span className="text-xs font-display font-semibold text-[#f3e7c4]">{profiles.mumu.name}</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#d4af37]/10 text-[#d4af37] font-mono border border-[#d4af37]/20">
+                    {profiles.mumu.location}
+                  </span>
+                </div>
+                <div className="space-y-1">
+                  <div className="text-[10px] uppercase font-semibold text-[#d4af37] tracking-wider flex items-center space-x-1">
+                    <Sparkles className="w-3 h-3 text-[#d4af37]" />
+                    <span>Current Mood</span>
+                  </div>
+                  <p className="text-xs text-[#f3e7c4] font-serif italic line-clamp-2">
+                    "{profiles.mumu.currentMood || 'Thinking of Sofs'}"
+                  </p>
+                </div>
+                <div className="mt-2 pt-1.5 border-t border-[#d4af37]/10 text-[9px] text-[#a39780] text-center font-mono">
+                  Click avatar to set mood ✎
+                </div>
+              </div>
             </div>
           </div>
 
@@ -178,30 +294,154 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Mood Edit Modal Dropdown */}
       {editingMoodFor && (
-        <div className="fixed inset-0 bg-[#000000]/60 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
-          <div className="glass-panel p-6 rounded-2xl max-w-sm w-full border border-[#d4af37]/30 shadow-2xl">
-            <h3 className="text-base font-display text-[#f3e7c4] mb-1">
-              Update Current Mood for {editingMoodFor === 'sofs' ? 'Sofs' : 'Mumu'}
-            </h3>
-            <p className="text-xs text-[#a39780] mb-4">What's on your mind or heart right now?</p>
+        <div className="fixed inset-0 bg-[#000000]/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
+          <div className="glass-panel p-6 rounded-3xl max-w-sm w-full border border-[#d4af37]/40 shadow-2xl space-y-4">
+            <div>
+              <h3 className="text-base font-display font-semibold text-[#f3e7c4] flex items-center space-x-2">
+                <Sparkles className="w-4 h-4 text-[#d4af37]" />
+                <span>Update {editingMoodFor === 'sofs' ? 'Sofs' : 'Mumu'}'s Mood</span>
+              </h3>
+              <p className="text-xs text-[#a39780] mt-0.5">What's on your mind or heart right now?</p>
+            </div>
+
             <input
               type="text"
               value={moodInput}
               onChange={(e) => setMoodInput(e.target.value)}
-              placeholder="e.g. Drinking tea & reading poetry..."
-              className="w-full px-3.5 py-2.5 rounded-xl bg-[#0e1017] border border-[#d4af37]/30 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#d4af37] mb-4"
+              placeholder="e.g. Cozy & drinking tea..."
+              className="w-full px-3.5 py-2.5 rounded-2xl bg-[#0e1017] border border-[#d4af37]/30 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#d4af37]"
               autoFocus
             />
-            <div className="flex justify-end space-x-2">
+
+            {/* Quick Preset Pills with Add/Edit/Delete Controls */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-[#8c816d] uppercase font-mono tracking-wider">
+                  Quick Preset Moods
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setIsAddingPreset(!isAddingPreset)}
+                  className="text-[10px] text-[#d4af37] hover:underline flex items-center space-x-0.5 cursor-pointer font-medium"
+                >
+                  <Plus className="w-3 h-3" />
+                  <span>New Preset</span>
+                </button>
+              </div>
+
+              {/* Add New Preset Form */}
+              {isAddingPreset && (
+                <form onSubmit={handleAddPreset} className="flex items-center space-x-1.5 animate-fade-in">
+                  <input
+                    type="text"
+                    value={newPresetText}
+                    onChange={(e) => setNewPresetText(e.target.value)}
+                    placeholder="e.g. 🌸 Relaxing in Garden"
+                    className="flex-1 px-2.5 py-1.5 rounded-xl bg-[#080a0f] border border-[#d4af37]/40 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#d4af37]"
+                    autoFocus
+                  />
+                  <button
+                    type="submit"
+                    className="p-1.5 rounded-xl bg-[#d4af37] text-[#0c0d12] hover:brightness-110 cursor-pointer"
+                    title="Add Preset"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setIsAddingPreset(false); setNewPresetText(''); }}
+                    className="p-1.5 rounded-xl bg-[#1a1c28] text-[#a39780] hover:text-[#f3e7c4] cursor-pointer"
+                    title="Cancel"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </form>
+              )}
+
+              {/* Preset List Pills */}
+              <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto custom-scrollbar p-0.5">
+                {moodPresets.map((preset, idx) => {
+                  const isEditingThis = editingPresetIdx === idx;
+
+                  if (isEditingThis) {
+                    return (
+                      <div key={idx} className="flex items-center space-x-1 bg-[#141620] p-1 rounded-xl border border-[#d4af37]/50 w-full">
+                        <input
+                          type="text"
+                          value={editingPresetVal}
+                          onChange={(e) => setEditingPresetVal(e.target.value)}
+                          className="flex-1 bg-transparent text-xs text-[#f3e7c4] focus:outline-none px-1"
+                          autoFocus
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleSaveEditPreset(idx)}
+                          className="p-1 text-emerald-400 hover:text-emerald-300 cursor-pointer"
+                        >
+                          <Check className="w-3 h-3" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setEditingPresetIdx(null)}
+                          className="p-1 text-[#a39780] hover:text-[#f3e7c4] cursor-pointer"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div
+                      key={idx}
+                      className="group/preset inline-flex items-center rounded-xl bg-[#141620] border border-[#d4af37]/20 text-[11px] text-[#c8bfab] hover:border-[#d4af37] hover:text-[#f3e7c4] transition"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setMoodInput(preset)}
+                        className="px-2.5 py-1 text-left cursor-pointer hover:text-[#d4af37]"
+                        title="Click to apply mood"
+                      >
+                        {preset}
+                      </button>
+
+                      {/* Edit & Delete Action Buttons */}
+                      <div className="flex items-center pr-1.5 opacity-0 group-hover/preset:opacity-100 transition space-x-1 border-l border-[#d4af37]/15 pl-1">
+                        <button
+                          type="button"
+                          onClick={() => handleStartEditPreset(idx, preset)}
+                          className="p-0.5 text-[#a39780] hover:text-[#d4af37] cursor-pointer"
+                          title="Modify preset"
+                        >
+                          <Edit2 className="w-2.5 h-2.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeletePreset(idx)}
+                          className="p-0.5 text-[#a39780] hover:text-rose-400 cursor-pointer"
+                          title="Delete preset"
+                        >
+                          <Trash2 className="w-2.5 h-2.5" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-2 pt-2 border-t border-[#d4af37]/15">
               <button
+                type="button"
                 onClick={() => setEditingMoodFor(null)}
-                className="px-3 py-1.5 rounded-lg text-xs text-[#a39780] hover:text-[#f3e7c4]"
+                className="px-3 py-1.5 rounded-xl text-xs text-[#a39780] hover:text-[#f3e7c4] cursor-pointer"
               >
                 Cancel
               </button>
               <button
-                onClick={() => handleSaveMood(editingMoodFor)}
-                className="px-4 py-1.5 rounded-lg bg-[#d4af37] text-[#0c0d12] text-xs font-semibold hover:brightness-110"
+                type="button"
+                onClick={() => handleSaveMood(editingMoodFor!)}
+                className="px-5 py-1.5 rounded-xl bg-[#d4af37] text-[#0c0d12] text-xs font-semibold hover:brightness-110 cursor-pointer"
               >
                 Save Mood
               </button>

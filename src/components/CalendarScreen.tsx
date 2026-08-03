@@ -1,28 +1,46 @@
 import React, { useState } from 'react';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, Clock, Sparkles, CheckCircle2, Circle } from 'lucide-react';
+import { 
+  Calendar as CalendarIcon, 
+  ChevronLeft, 
+  ChevronRight, 
+  Plus, 
+  Clock, 
+  Sparkles, 
+  CheckCircle2, 
+  Circle,
+  Edit2,
+  Trash2
+} from 'lucide-react';
 import { CalendarEvent, CountdownItem } from '../types';
 
 interface CalendarScreenProps {
   events: CalendarEvent[];
-  countdowns: CountdownItem[];
+  countdowns?: CountdownItem[];
   onAddEvent: (event: Omit<CalendarEvent, 'id'>) => void;
+  onUpdateEvent?: (id: string, event: Omit<CalendarEvent, 'id'>) => void;
+  onDeleteEvent?: (id: string) => void;
   onToggleEventCompleted: (id: string) => void;
 }
 
 export const CalendarScreen: React.FC<CalendarScreenProps> = ({
   events,
-  countdowns,
   onAddEvent,
+  onUpdateEvent,
+  onDeleteEvent,
   onToggleEventCompleted
 }) => {
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 9, 1)); // October 2025
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  // Start calendar view at August 2026
+  const [currentDate, setCurrentDate] = useState(new Date(2026, 7, 1)); // Month index 7 = August
+
+  // Add / Edit Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingEventId, setEditingEventId] = useState<string | null>(null);
 
   const [title, setTitle] = useState('');
-  const [date, setDate] = useState('2025-10-14');
-  const [time, setTime] = useState('10:00 AM');
+  const [date, setDate] = useState('2026-08-15');
+  const [time, setTime] = useState('08:00 PM');
   const [endTime, setEndTime] = useState('');
-  const [category, setCategory] = useState<'anniversary' | 'date-night' | 'travel' | 'faith' | 'reminder' | 'special'>('anniversary');
+  const [category, setCategory] = useState<'anniversary' | 'date-night' | 'travel' | 'faith' | 'reminder' | 'special'>('date-night');
   const [notes, setNotes] = useState('');
 
   const monthNames = [
@@ -44,22 +62,84 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
   const firstDayIndex = new Date(year, month, 1).getDay();
   const totalDays = new Date(year, month + 1, 0).getDate();
 
+  // Helper to calculate days left relative to August 2, 2026
+  const calculateDaysLeft = (targetDateStr: string) => {
+    const today = new Date(2026, 7, 2); // August 2, 2026
+    today.setHours(0, 0, 0, 0);
+
+    const [y, m, d] = targetDateStr.split('-').map(Number);
+    if (!y || !m || !d) return 0;
+    const target = new Date(y, m - 1, d);
+    target.setHours(0, 0, 0, 0);
+
+    const diffTime = target.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  // Dynamically compute Top 3 upcoming events (sorted by date chronologically)
+  const sortedUpcomingEvents = [...events].sort((a, b) => a.date.localeCompare(b.date));
+  const top3Upcoming = sortedUpcomingEvents.slice(0, 3);
+
+  // Modal Handlers
+  const handleOpenAddModal = (initialDate?: string) => {
+    setEditingEventId(null);
+    setTitle('');
+    setDate(initialDate || `${year}-${String(month + 1).padStart(2, '0')}-15`);
+    setTime('08:00 PM');
+    setEndTime('');
+    setCategory('date-night');
+    setNotes('');
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEditModal = (ev: CalendarEvent) => {
+    setEditingEventId(ev.id);
+    setTitle(ev.title);
+    setDate(ev.date);
+    setTime(ev.time || '');
+    setEndTime(ev.endTime || '');
+    setCategory(ev.category || 'special');
+    setNotes(ev.notes || '');
+    setIsModalOpen(true);
+  };
+
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title) return;
-    onAddEvent({
-      title,
+    if (!title || !date) return;
+
+    const payload = {
+      title: title.trim(),
       date,
-      time,
+      time: time.trim() || undefined,
       endTime: endTime.trim() || undefined,
       category,
-      notes,
+      notes: notes.trim() || undefined,
       isCompleted: false
-    });
-    setTitle('');
-    setEndTime('');
-    setNotes('');
-    setIsAddModalOpen(false);
+    };
+
+    if (editingEventId && onUpdateEvent) {
+      onUpdateEvent(editingEventId, payload);
+    } else {
+      onAddEvent(payload);
+    }
+
+    setIsModalOpen(false);
+  };
+
+  const getCategoryBadgeStyle = (cat?: string) => {
+    switch (cat) {
+      case 'anniversary':
+        return 'bg-amber-500/20 text-amber-300 border-amber-500/30';
+      case 'travel':
+        return 'bg-blue-500/20 text-blue-300 border-blue-500/30';
+      case 'faith':
+        return 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
+      case 'date-night':
+        return 'bg-rose-500/20 text-rose-300 border-rose-500/30';
+      default:
+        return 'bg-purple-500/20 text-purple-300 border-purple-500/30';
+    }
   };
 
   return (
@@ -74,39 +154,100 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
           </div>
           <h2 className="text-2xl sm:text-3xl font-display font-semibold text-[#fff8e7]">Synchronized Rhythms</h2>
           <p className="text-xs sm:text-sm font-serif italic text-[#c8bfab]">
-            Rabi' al-Awwal - Rabi' al-Thani 1447 • London &amp; New York Time
+            Safar - Rabi' al-Awwal 1448 • London &amp; New York Time
           </p>
         </div>
 
         <button
-          onClick={() => setIsAddModalOpen(true)}
+          onClick={() => handleOpenAddModal()}
           className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#d4af37] via-[#e5c158] to-[#aa8022] text-[#0c0d12] font-semibold text-xs tracking-wider hover:brightness-110 transition shadow-lg shadow-[#d4af37]/20 flex items-center space-x-2 cursor-pointer"
         >
           <Plus className="w-4 h-4" />
-          <span>Add Event</span>
+          <span>Add Plan</span>
         </button>
       </div>
 
-      {/* Countdowns Bar */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {countdowns.map((cd) => (
-          <div key={cd.id} className="glass-panel p-5 rounded-2xl border border-[#d4af37]/20 flex items-center justify-between">
-            <div>
-              <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${cd.badgeColor || 'bg-amber-500/20 text-amber-300'}`}>
-                {cd.category}
-              </span>
-              <h4 className="text-sm font-display font-semibold text-[#fff8e7] mt-1.5">{cd.title}</h4>
-              <p className="text-[11px] text-[#a39780]">{cd.targetDate}</p>
+      {/* Dynamic Top 3 Upcoming Plans Cards */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs uppercase tracking-widest font-semibold text-[#d4af37] flex items-center space-x-2">
+            <Sparkles className="w-3.5 h-3.5 text-[#d4af37]" />
+            <span>Top Upcoming Highlights</span>
+          </h3>
+          <span className="text-[11px] text-[#8c816d]">Auto-updated from plans</span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {top3Upcoming.map((ev) => {
+            const daysLeft = calculateDaysLeft(ev.date);
+            return (
+              <div 
+                key={ev.id} 
+                className="glass-panel p-5 rounded-2xl border border-[#d4af37]/20 flex flex-col justify-between space-y-3 relative group hover:border-[#d4af37]/50 transition"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${getCategoryBadgeStyle(ev.category)} uppercase tracking-wider`}>
+                    {ev.category || 'Special'}
+                  </span>
+
+                  {/* Actions: Edit & Delete */}
+                  <div className="flex items-center space-x-1 opacity-80 group-hover:opacity-100 transition">
+                    <button
+                      onClick={() => handleOpenEditModal(ev)}
+                      title="Edit Plan"
+                      className="p-1 rounded-lg text-[#a39780] hover:text-[#d4af37] hover:bg-[#d4af37]/10 transition cursor-pointer"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
+
+                    {onDeleteEvent && (
+                      <button
+                        onClick={() => {
+                          if (confirm(`Delete plan "${ev.title}"?`)) {
+                            onDeleteEvent(ev.id);
+                          }
+                        }}
+                        title="Delete Plan"
+                        className="p-1 rounded-lg text-[#a39780] hover:text-rose-400 hover:bg-rose-950/30 transition cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-display font-semibold text-[#fff8e7] line-clamp-1">{ev.title}</h4>
+                  <p className="text-[11px] text-[#a39780] font-mono mt-0.5">{ev.date} {ev.time ? `• ${ev.time}` : ''}</p>
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-[#d4af37]/10">
+                  <span className="text-[10px] text-[#8c816d] italic line-clamp-1">
+                    {ev.notes || 'Shared plan'}
+                  </span>
+
+                  <div className="text-right shrink-0">
+                    <span className="text-xl font-display font-bold text-[#d4af37]">
+                      {daysLeft > 0 ? daysLeft : daysLeft === 0 ? 'Today' : 'Past'}
+                    </span>
+                    {daysLeft > 0 && (
+                      <span className="text-[9px] text-[#8c816d] block uppercase font-mono">Days Left</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+
+          {top3Upcoming.length === 0 && (
+            <div className="col-span-full p-6 text-center glass-panel rounded-2xl border border-[#d4af37]/20 text-xs text-[#a39780]">
+              No upcoming plans scheduled yet. Click "Add Plan" to create your first shared event!
             </div>
-            <div className="text-right">
-              <span className="text-2xl font-display font-bold text-[#d4af37]">26</span>
-              <span className="text-[10px] text-[#8c816d] block uppercase font-mono">Days Left</span>
-            </div>
-          </div>
-        ))}
+          )}
+        </div>
       </div>
 
-      {/* Main Grid: Month Calendar (8 cols) & Today's Schedule (4 cols) */}
+      {/* Main Grid: Month Calendar (8 cols) & Upcoming Plans List (4 cols) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* Calendar View */}
@@ -118,7 +259,7 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
               <h3 className="text-xl font-display font-semibold text-[#fff8e7]">
                 {monthNames[month]} {year}
               </h3>
-              <p className="text-xs text-[#a39780]">Click any day to schedule shared plans</p>
+              <p className="text-xs text-[#a39780]">Click any day cell to schedule or edit plans</p>
             </div>
 
             <div className="flex items-center space-x-2">
@@ -155,18 +296,18 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
             {Array.from({ length: totalDays }).map((_, idx) => {
               const dayNum = idx + 1;
               const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
-              const dayEvents = events.filter(e => e.date === dateString || (dayNum === 14 && month === 9)); // highlighting 14th
+              const dayEvents = events.filter(e => e.date === dateString);
 
-              const isToday = dayNum === 14 && month === 9; // Oct 14 highlight
+              const isToday = dayNum === 2 && month === 7 && year === 2026; // August 2, 2026 highlight
 
               return (
                 <div
                   key={dayNum}
-                  onClick={() => { setDate(dateString); setIsAddModalOpen(true); }}
+                  onClick={() => handleOpenAddModal(dateString)}
                   className={`h-20 sm:h-24 p-2 rounded-2xl border transition cursor-pointer flex flex-col justify-between overflow-hidden group ${
                     isToday
                       ? 'bg-[#1e1a12] border-[#d4af37] shadow-md shadow-[#d4af37]/20'
-                      : 'bg-[#12141d]/80 border-[#d4af37]/10 hover:border-[#d4af37]/30 hover:bg-[#181a24]'
+                      : 'bg-[#12141d]/80 border-[#d4af37]/10 hover:border-[#d4af37]/40 hover:bg-[#181a24]'
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -180,7 +321,12 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
                     {dayEvents.slice(0, 2).map((ev) => (
                       <div
                         key={ev.id}
-                        className="px-1.5 py-0.5 rounded-lg bg-[#d4af37]/20 text-[#f3e7c4] text-[9px] font-medium truncate border border-[#d4af37]/30"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenEditModal(ev);
+                        }}
+                        className="px-1.5 py-0.5 rounded-lg bg-[#d4af37]/20 hover:bg-[#d4af37]/40 text-[#f3e7c4] text-[9px] font-medium truncate border border-[#d4af37]/30 transition"
+                        title={ev.title}
                       >
                         {ev.title}
                       </div>
@@ -196,24 +342,34 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
 
         </div>
 
-        {/* Right Side: Today's Rhythm Schedule & Events List (4 cols) */}
+        {/* Right Side: Upcoming Plans List */}
         <div className="lg:col-span-4 space-y-6">
           <div className="glass-panel p-6 rounded-3xl border border-[#d4af37]/20 space-y-4">
-            <h3 className="text-base font-display font-semibold text-[#fff8e7] flex items-center space-x-2">
-              <Clock className="w-4 h-4 text-[#d4af37]" />
-              <span>Upcoming Plans</span>
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-display font-semibold text-[#fff8e7] flex items-center space-x-2">
+                <Clock className="w-4 h-4 text-[#d4af37]" />
+                <span>Upcoming Plans ({sortedUpcomingEvents.length})</span>
+              </h3>
 
-            <div className="space-y-3">
-              {events.map((ev) => (
+              <button
+                onClick={() => handleOpenAddModal()}
+                className="text-xs text-[#d4af37] hover:underline font-semibold flex items-center space-x-1 cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add</span>
+              </button>
+            </div>
+
+            <div className="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar pr-1">
+              {sortedUpcomingEvents.map((ev) => (
                 <div 
                   key={ev.id}
-                  className="p-3.5 rounded-2xl bg-[#141620] border border-[#d4af37]/15 space-y-2"
+                  className="p-3.5 rounded-2xl bg-[#141620] border border-[#d4af37]/15 space-y-2 hover:border-[#d4af37]/30 transition group"
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-start justify-between gap-2">
                     <button
                       onClick={() => onToggleEventCompleted(ev.id)}
-                      className="flex items-center space-x-2 text-xs font-semibold text-[#f3e7c4] hover:text-[#d4af37] transition cursor-pointer"
+                      className="flex items-center space-x-2 text-xs font-semibold text-[#f3e7c4] hover:text-[#d4af37] transition cursor-pointer text-left"
                     >
                       {ev.isCompleted ? (
                         <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -224,14 +380,39 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
                         {ev.title}
                       </span>
                     </button>
-                    <div className="text-right shrink-0 ml-2">
-                      <span className="text-[10px] text-[#d4af37] font-mono block">{ev.date}</span>
-                      {(ev.time || ev.endTime) && (
-                        <span className="text-[9px] text-[#a39780] font-mono block">
-                          {ev.time || ''}{ev.time && ev.endTime ? ' - ' : ''}{ev.endTime || ''}
-                        </span>
+
+                    <div className="flex items-center space-x-1 shrink-0 opacity-80 group-hover:opacity-100 transition">
+                      <button
+                        onClick={() => handleOpenEditModal(ev)}
+                        title="Edit Plan"
+                        className="p-1 rounded-lg text-[#a39780] hover:text-[#d4af37] hover:bg-[#d4af37]/10 cursor-pointer"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+
+                      {onDeleteEvent && (
+                        <button
+                          onClick={() => {
+                            if (confirm(`Delete plan "${ev.title}"?`)) {
+                              onDeleteEvent(ev.id);
+                            }
+                          }}
+                          title="Delete Plan"
+                          className="p-1 rounded-lg text-[#a39780] hover:text-rose-400 hover:bg-rose-950/30 cursor-pointer"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       )}
                     </div>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[10px] text-[#d4af37] font-mono pl-6">
+                    <span>{ev.date}</span>
+                    {(ev.time || ev.endTime) && (
+                      <span className="text-[#a39780]">
+                        {ev.time || ''}{ev.time && ev.endTime ? ' - ' : ''}{ev.endTime || ''}
+                      </span>
+                    )}
                   </div>
 
                   {ev.notes && (
@@ -241,24 +422,32 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
                   )}
                 </div>
               ))}
+
+              {sortedUpcomingEvents.length === 0 && (
+                <div className="p-6 text-center text-xs text-[#8c816d] italic">
+                  No plans added yet.
+                </div>
+              )}
             </div>
           </div>
         </div>
 
       </div>
 
-      {/* Add Event Modal */}
-      {isAddModalOpen && (
+      {/* Add / Edit Event Modal */}
+      {isModalOpen && (
         <div className="fixed inset-0 bg-[#000000]/75 z-50 flex items-center justify-center p-4 backdrop-blur-md">
-          <div className="glass-panel max-w-md w-full p-6 rounded-3xl border border-[#d4af37]/30 shadow-2xl space-y-4 relative">
+          <div className="glass-panel max-w-md w-full p-6 sm:p-8 rounded-3xl border border-[#d4af37]/30 shadow-2xl space-y-4 relative">
             <button
-              onClick={() => setIsAddModalOpen(false)}
+              onClick={() => setIsModalOpen(false)}
               className="absolute top-4 right-4 text-[#a39780] hover:text-[#f3e7c4] text-xl font-bold cursor-pointer"
             >
               &times;
             </button>
 
-            <h3 className="text-xl font-display text-[#fff8e7]">Schedule New Event</h3>
+            <h3 className="text-xl font-display text-[#fff8e7]">
+              {editingEventId ? 'Edit Shared Plan' : 'Schedule New Plan'}
+            </h3>
 
             <form onSubmit={handleFormSubmit} className="space-y-3">
               <div>
@@ -291,7 +480,7 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
                     type="text"
                     value={time}
                     onChange={(e) => setTime(e.target.value)}
-                    placeholder="e.g. 10:00 AM"
+                    placeholder="e.g. 08:00 PM"
                     className="w-full px-3 py-2 rounded-xl bg-[#0e1017] border border-[#d4af37]/30 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#d4af37]"
                   />
                 </div>
@@ -303,7 +492,7 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
                     type="text"
                     value={endTime}
                     onChange={(e) => setEndTime(e.target.value)}
-                    placeholder="e.g. 02:00 PM"
+                    placeholder="e.g. 11:00 PM"
                     className="w-full px-3 py-2 rounded-xl bg-[#0e1017] border border-[#d4af37]/30 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#d4af37]"
                   />
                 </div>
@@ -316,9 +505,9 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
                   onChange={(e) => setCategory(e.target.value as any)}
                   className="w-full px-3 py-2 rounded-xl bg-[#0e1017] border border-[#d4af37]/30 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#d4af37]"
                 >
-                  <option value="anniversary">Anniversary</option>
                   <option value="date-night">Date Night</option>
                   <option value="travel">Travel</option>
+                  <option value="anniversary">Anniversary</option>
                   <option value="faith">Faith / Ramadan</option>
                   <option value="special">Special</option>
                 </select>
@@ -338,7 +527,7 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
               <div className="flex justify-end space-x-2 pt-3 border-t border-[#d4af37]/15">
                 <button
                   type="button"
-                  onClick={() => setIsAddModalOpen(false)}
+                  onClick={() => setIsModalOpen(false)}
                   className="px-4 py-2 rounded-xl text-xs text-[#a39780] hover:text-[#f3e7c4] cursor-pointer"
                 >
                   Cancel
@@ -347,7 +536,7 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
                   type="submit"
                   className="px-5 py-2 rounded-xl bg-[#d4af37] text-[#0c0d12] text-xs font-semibold hover:brightness-110 cursor-pointer"
                 >
-                  Add Event
+                  {editingEventId ? 'Save Changes' : 'Add Plan'}
                 </button>
               </div>
             </form>
