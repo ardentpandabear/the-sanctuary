@@ -16,8 +16,8 @@ import {
   EchoItem,
   DailyLetter
 } from '../types';
-import pp from './pp.jpg';
-import sofsImg from './WhatsApp Image 2024-06-05 at 11.30.51 PM.jpg';
+import pp from "./pp.jpg";
+import sofsImg from "./WhatsApp Image 2024-06-05 at 11.30.51 PM.jpeg";
 
 export const initialProfiles: { sofs: PartnerProfile; mumu: PartnerProfile } = {
   sofs: {
