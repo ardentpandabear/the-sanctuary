@@ -220,41 +220,36 @@ const daysLeft = Math.ceil(birthdayDiff / (1000 * 60 * 60 * 24));
               <span>Our Song Right Now</span>
             </h3>
 
-            <div className="glass-panel p-5 rounded-3xl border border-[#d4af37]/20 relative overflow-hidden">
+            <div 
+              onClick={() => setActiveTab('music')}
+              className="glass-panel p-5 rounded-3xl border border-[#d4af37]/20 relative overflow-hidden cursor-pointer hover:border-[#d4af37]/50 transition group"
+            >
               <div className="flex items-center space-x-4">
                 <div className="relative w-20 h-20 rounded-2xl overflow-hidden shrink-0 shadow-lg border border-[#d4af37]/30">
                   <img
                     src={featuredSong.coverUrl}
                     alt={featuredSong.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                   />
-                  <button
-                    onClick={() => setIsPlayingSong(!isPlayingSong)}
-                    className="absolute inset-0 bg-[#000000]/40 flex items-center justify-center text-[#d4af37] hover:scale-110 transition cursor-pointer"
-                  >
-                    {isPlayingSong ? <Pause className="w-8 h-8 fill-[#d4af37]" /> : <Play className="w-8 h-8 fill-[#d4af37] ml-1" />}
-                  </button>
+                  <div className="absolute inset-0 bg-[#000000]/30 group-hover:bg-[#000000]/10 flex items-center justify-center text-[#d4af37] transition">
+                    <Music className="w-7 h-7 text-[#d4af37] group-hover:scale-110 transition" />
+                  </div>
                 </div>
 
-                <div className="space-y-1 overflow-hidden">
-                  <span className="px-2 py-0.5 rounded-full bg-[#d4af37]/15 text-[#d4af37] text-[10px] font-semibold">
-                    {featuredSong.moodTags[0]}
-                  </span>
-                  <h4 className="text-base font-display font-semibold text-[#fff8e7] truncate">
+                <div className="space-y-1 overflow-hidden flex-1">
+                  <div className="flex items-center justify-between">
+                    <span className="px-2 py-0.5 rounded-full bg-[#d4af37]/15 text-[#d4af37] text-[10px] font-semibold">
+                      {featuredSong.moodTags[0]}
+                    </span>
+                    <span className="text-[10px] text-[#d4af37] flex items-center space-x-1 opacity-80 group-hover:opacity-100 group-hover:translate-x-0.5 transition font-medium">
+                      <span>Music Library</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </span>
+                  </div>
+                  <h4 className="text-base font-display font-semibold text-[#fff8e7] truncate group-hover:text-[#d4af37] transition">
                     {featuredSong.title}
                   </h4>
                   <p className="text-xs text-[#a39780]">{featuredSong.artist}</p>
-                </div>
-              </div>
-
-              {/* Progress Bar Simulation */}
-              <div className="mt-4 space-y-1">
-                <div className="w-full h-1.5 rounded-full bg-[#1a1d29] overflow-hidden">
-                  <div className={`h-full bg-gradient-to-r from-[#d4af37] to-[#f3e7c4] transition-all duration-300 ${isPlayingSong ? 'w-2/3 animate-pulse' : 'w-1/3'}`} />
-                </div>
-                <div className="flex justify-between text-[10px] text-[#8c816d]">
-                  <span>1:24</span>
-                  <span>{featuredSong.duration}</span>
                 </div>
               </div>
 
@@ -263,6 +258,7 @@ const daysLeft = Math.ceil(birthdayDiff / (1000 * 60 * 60 * 24));
               </p>
             </div>
           </div>
+
 
           {/* Activity Feed Echoes */}
           <div className="space-y-3">
