@@ -13,7 +13,8 @@ import {
   Compass, 
   Quote as QuoteIcon,
   Plus,
-  Volume2
+  Volume2,
+  Image as ImageIcon
 } from 'lucide-react';
 import { Chapter, Song, EchoItem, PartnerProfile, ActiveTab } from '../types';
 import { CityTimeWeatherWidget } from './CityTimeWeatherWidget';
@@ -38,29 +39,16 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   const [isPlayingSong, setIsPlayingSong] = useState(false);
   const [showMemoryModal, setShowMemoryModal] = useState(false);
 
-  // Calculate dynamic days since June 5, 2026
-  const firstMetDate = new Date('2026-06-05');
+  // Calculate dynamic days since October 14, 2021
+  const firstMetDate = new Date('2021-10-14');
   const now = new Date();
   const diffTime = Math.abs(now.getTime() - firstMetDate.getTime());
   const daysTogether = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  // Next Anniversary Jun 5
-  const nextAnniv = new Date(now.getFullYear(), 5, 5);
+  // Next Anniversary Oct 14
+  const nextAnniv = new Date(now.getFullYear(), 9, 14);
   if (now > nextAnniv) nextAnniv.setFullYear(now.getFullYear() + 1);
   const daysToAnniv = Math.ceil((nextAnniv.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-
-  // Calculate days until next Nov 7
-const today = new Date();
-
-let nextBirthday = new Date(today.getFullYear(), 10, 7); // Month is 0-indexed, so 10 = November
-
-// If this year's birthday has already passed, use next year's
-if (today > nextBirthday) {
-  nextBirthday = new Date(today.getFullYear() + 1, 10, 7);
-}
-
-const diffTime = nextBirthday - today;
-const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
   return (
     <div className="space-y-8 pb-12 animate-fade-in">
@@ -117,7 +105,7 @@ const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             <div className="text-2xl sm:text-3xl font-display font-bold text-[#fff8e7]">
               {daysTogether.toLocaleString()} <span className="text-sm font-sans font-normal text-[#d4af37]">Days</span>
             </div>
-            <p className="text-xs text-[#a39780] mt-0.5">Since our first message on Insta (Jun 5, 2026)</p>
+            <p className="text-xs text-[#a39780] mt-0.5">Since our first hello in London (Oct 14, 2021)</p>
           </div>
         </div>
 
@@ -130,29 +118,23 @@ const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             <div className="text-2xl sm:text-3xl font-display font-bold text-[#fff8e7]">
               {daysToAnniv} <span className="text-sm font-sans font-normal text-[#d4af37]">Days Away</span>
             </div>
-            <p className="text-xs text-[#a39780] mt-0.5">Next Anniversary (June 5, 2026)</p>
+            <p className="text-xs text-[#a39780] mt-0.5">Next Anniversary (October 14, 2025)</p>
           </div>
         </div>
 
-{/* Next Birthday */}
-<div className="glass-panel p-5 rounded-2xl border border-[#d4af37]/20 flex items-center space-x-4">
-  <div className="w-12 h-12 rounded-2xl bg-[#1e1b15] border border-[#d4af37]/40 flex items-center justify-center text-[#d4af37] shadow-md">
-    <Compass className="w-6 h-6 text-[#d4af37]" />
-  </div>
-
-  <div>
-    <div className="text-2xl sm:text-3xl font-display font-bold text-[#fff8e7]">
-      {daysLeft}{" "}
-      <span className="text-sm font-sans font-normal text-[#d4af37]">
-        {daysLeft === 1 ? "Day" : "Days"}
-      </span>
-    </div>
-
-    <p className="text-xs text-[#a39780] mt-0.5">
-      Until Sof's Birthday 🎂
-    </p>
-  </div>
-</div>
+        {/* Next Meeting */}
+        <div className="glass-panel p-5 rounded-2xl border border-[#d4af37]/20 flex items-center space-x-4">
+          <div className="w-12 h-12 rounded-2xl bg-[#1e1b15] border border-[#d4af37]/40 flex items-center justify-center text-[#d4af37] shadow-md">
+            <Compass className="w-6 h-6 text-[#d4af37]" />
+          </div>
+          <div>
+            <div className="text-2xl sm:text-3xl font-display font-bold text-[#fff8e7]">
+              26 <span className="text-sm font-sans font-normal text-[#d4af37]">Days</span>
+            </div>
+            <p className="text-xs text-[#a39780] mt-0.5">Until London Reunion Flight ✈️</p>
+          </div>
+        </div>
+      </div>
 
       {/* Dual City Time & Temperature Widget (Allahabad & Birmingham) */}
       <CityTimeWeatherWidget />
@@ -282,26 +264,81 @@ const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
           {/* Activity Feed Echoes */}
           <div className="space-y-3">
-            <h3 className="text-lg font-display text-[#f3e7c4] flex items-center space-x-2">
-              <Clock className="w-4 h-4 text-[#d4af37]" />
-              <span>Recent Echoes</span>
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-display text-[#f3e7c4] flex items-center space-x-2">
+                <Clock className="w-4 h-4 text-[#d4af37]" />
+                <span>Recent Echoes</span>
+              </h3>
+              <div className="flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] text-emerald-400 font-medium">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                <span>Live Feed</span>
+              </div>
+            </div>
 
-            <div className="glass-panel p-4 rounded-3xl border border-[#d4af37]/15 space-y-3">
-              {echoes.map((echo) => (
-                <div key={echo.id} className="flex items-start space-x-3 p-2.5 rounded-xl hover:bg-[#181a24] transition">
-                  <img
-                    src={echo.avatar}
-                    alt={echo.author}
-                    className="w-8 h-8 rounded-full object-cover border border-[#d4af37]/40 shrink-0"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-[#f3e7c4] truncate">{echo.title}</p>
-                    <p className="text-[11px] text-[#a39780] truncate">{echo.subtitle}</p>
-                    <span className="text-[9px] text-[#736a58] block mt-0.5">{echo.timestamp}</span>
-                  </div>
+            <div className="glass-panel p-4 rounded-3xl border border-[#d4af37]/15 space-y-2.5 max-h-88 overflow-y-auto custom-scrollbar">
+              {echoes && echoes.length > 0 ? (
+                echoes.map((echo) => {
+                  const getEchoIcon = (type: EchoItem['type']) => {
+                    switch (type) {
+                      case 'chapter':
+                        return <BookOpen className="w-3 h-3 text-[#d4af37]" />;
+                      case 'song':
+                        return <Music className="w-3 h-3 text-emerald-400" />;
+                      case 'photo':
+                        return <ImageIcon className="w-3 h-3 text-amber-400" />;
+                      case 'quote':
+                        return <QuoteIcon className="w-3 h-3 text-rose-400" />;
+                      case 'memory':
+                      default:
+                        return <Heart className="w-3 h-3 text-[#d4af37]" />;
+                    }
+                  };
+
+                  return (
+                    <div 
+                      key={echo.id} 
+                      className="flex items-start space-x-3 p-2.5 rounded-2xl bg-[#0e1017]/80 hover:bg-[#181a24] border border-[#d4af37]/10 hover:border-[#d4af37]/30 transition group"
+                    >
+                      <div className="relative shrink-0 mt-0.5">
+                        <img
+                          src={echo.avatar}
+                          alt={echo.author}
+                          className="w-8 h-8 rounded-full object-cover border border-[#d4af37]/40 shadow-sm"
+                        />
+                        <div className="absolute -bottom-1 -right-1 p-0.5 rounded-full bg-[#0c0d12] border border-[#d4af37]/30 shadow">
+                          {getEchoIcon(echo.type)}
+                        </div>
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs font-semibold text-[#f3e7c4] truncate group-hover:text-[#d4af37] transition">
+                            {echo.title}
+                          </p>
+                          <span className="text-[9px] text-[#8c816d] shrink-0 ml-2 font-mono">{echo.timestamp}</span>
+                        </div>
+                        <p className="text-[11px] text-[#a39780] line-clamp-2 mt-0.5">{echo.subtitle}</p>
+
+                        {echo.imageUrl && (
+                          <div className="mt-2 rounded-xl overflow-hidden aspect-[16/8] border border-[#d4af37]/20 max-w-[180px]">
+                            <img src={echo.imageUrl} alt="" className="w-full h-full object-cover" />
+                          </div>
+                        )}
+
+                        <div className="flex items-center space-x-2 mt-1">
+                          <span className="text-[9px] text-[#d4af37]/80 uppercase tracking-wider font-mono">
+                            By {echo.author === 'sofs' ? 'Sofs' : echo.author === 'mumu' ? 'Mumu' : 'Sofs & Mumu'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="text-center py-6 text-xs text-[#a39780] italic">
+                  No echoes recorded yet. Actions across your sanctuary will automatically appear here!
                 </div>
-              ))}
+              )}
             </div>
           </div>
 

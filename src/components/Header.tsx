@@ -440,7 +440,7 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
               <button
                 type="button"
-                onClick={() => handleSaveMood(editingMoodFor!)}
+                onClick={() => handleSaveMood(editingMoodFor)}
                 className="px-5 py-1.5 rounded-xl bg-[#d4af37] text-[#0c0d12] text-xs font-semibold hover:brightness-110 cursor-pointer"
               >
                 Save Mood

@@ -388,7 +388,7 @@ export const OurStoryScreen: React.FC<OurStoryScreenProps> = ({
                 <span>{editingChapterId ? 'Modify Chapter' : 'Record New Chapter'}</span>
               </h3>
               <p className="text-xs text-[#a39780]">
-                {editingChapterId ? "Update this memory in Sofs & Mumu's chronicle." : "Immortalize a new memory in Sofs & Mumu's chronicle."}
+                {editingChapterId ? 'Update this memory in Sofs & Mumu’s chronicle.' : 'Immortalize a new memory in Sofs & Mumu’s chronicle.'}
               </p>
             </div>
 

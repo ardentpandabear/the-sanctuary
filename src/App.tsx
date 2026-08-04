@@ -54,11 +54,9 @@ import {
   QuizCard, 
   QuizSet,
   PhotoItem,
-  DailyLetter 
+  DailyLetter,
+  EchoItem
 } from './types';
-
-import { getTableData, subscribeToTable, upsertTableItem, deleteTableItem } from './services/db';
-
 
 export default function App() {
   const [isLocked, setIsLocked] = useState(true);
@@ -142,10 +140,50 @@ export default function App() {
     return saved ? JSON.parse(saved) : initialQuizSets;
   });
 
+  const [echoes, setEchoes] = useState<EchoItem[]>(() => {
+    const saved = localStorage.getItem('sanctuary_echoes');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return initialEchoes;
+  });
+
   // Save changes to localStorage
   useEffect(() => { localStorage.setItem('sanctuary_profiles', JSON.stringify(profiles)); }, [profiles]);
   useEffect(() => { localStorage.setItem('sanctuary_daily_letters', JSON.stringify(dailyLetters)); }, [dailyLetters]);
   useEffect(() => { localStorage.setItem('sanctuary_chapters', JSON.stringify(chapters)); }, [chapters]);
+  useEffect(() => { localStorage.setItem('sanctuary_events', JSON.stringify(calendarEvents)); }, [calendarEvents]);
+  useEffect(() => { localStorage.setItem('sanctuary_little_things', JSON.stringify(littleThings)); }, [littleThings]);
+  useEffect(() => { localStorage.setItem('sanctuary_songs', JSON.stringify(songs)); }, [songs]);
+  useEffect(() => { localStorage.setItem('sanctuary_albums', JSON.stringify(photoAlbums)); }, [photoAlbums]);
+  useEffect(() => { localStorage.setItem('sanctuary_contacts', JSON.stringify(contacts)); }, [contacts]);
+  useEffect(() => { localStorage.setItem('sanctuary_milestones', JSON.stringify(milestones)); }, [milestones]);
+  useEffect(() => { localStorage.setItem('sanctuary_verses', JSON.stringify(verses)); }, [verses]);
+  useEffect(() => { localStorage.setItem('sanctuary_reflections', JSON.stringify(reflections)); }, [reflections]);
+  useEffect(() => { localStorage.setItem('sanctuary_bucket', JSON.stringify(bucketList)); }, [bucketList]);
+  useEffect(() => { localStorage.setItem('sanctuary_quiz', JSON.stringify(quizCards)); }, [quizCards]);
+  useEffect(() => { localStorage.setItem('sanctuary_quiz_sets', JSON.stringify(quizSets)); }, [quizSets]);
+  useEffect(() => { localStorage.setItem('sanctuary_echoes', JSON.stringify(echoes)); }, [echoes]);
+
+  // Helper to append a dynamic Echo entry automatically
+  const addEcho = (echo: Omit<EchoItem, 'id' | 'timestamp' | 'avatar' | 'author'> & { author?: 'sofs' | 'mumu' | 'both'; timestamp?: string; avatar?: string }) => {
+    const authorKey: 'sofs' | 'mumu' = echo.author === 'mumu' ? 'mumu' : 'sofs';
+    const newEcho: EchoItem = {
+      id: `echo-${Date.now()}`,
+      type: echo.type,
+      title: echo.title,
+      subtitle: echo.subtitle,
+      timestamp: echo.timestamp || 'Just now',
+      author: authorKey,
+      avatar: echo.avatar || profiles[authorKey]?.avatar || initialProfiles[authorKey]?.avatar,
+      imageUrl: echo.imageUrl
+    };
+    setEchoes(prev => [newEcho, ...prev].slice(0, 30));
+  };
 
   // Handler functions
   const handleSaveDailyLetter = (newLetter: Omit<DailyLetter, 'id' | 'createdAt'>) => {
@@ -172,148 +210,118 @@ export default function App() {
       };
       setDailyLetters([created, ...dailyLetters]);
     }
+
+    addEcho({
+      type: 'quote',
+      title: `Sent a Sealed Letter: "${newLetter.title || 'Personal Letter'}"`,
+      subtitle: `From ${newLetter.from === 'sofs' ? 'Sofs' : 'Mumu'} to ${newLetter.to === 'sofs' ? 'Sofs' : 'Mumu'}`,
+      author: newLetter.from
+    });
   };
 
   const handleMarkLetterAsRead = (id: string) => {
     setDailyLetters(dailyLetters.map(l => l.id === id ? { ...l, isRead: true } : l));
   };
-  useEffect(() => { localStorage.setItem('sanctuary_events', JSON.stringify(calendarEvents)); }, [calendarEvents]);
-  useEffect(() => { localStorage.setItem('sanctuary_little_things', JSON.stringify(littleThings)); }, [littleThings]);
-  useEffect(() => { localStorage.setItem('sanctuary_songs', JSON.stringify(songs)); }, [songs]);
-  useEffect(() => { localStorage.setItem('sanctuary_albums', JSON.stringify(photoAlbums)); }, [photoAlbums]);
-  useEffect(() => { localStorage.setItem('sanctuary_contacts', JSON.stringify(contacts)); }, [contacts]);
-  useEffect(() => { localStorage.setItem('sanctuary_milestones', JSON.stringify(milestones)); }, [milestones]);
-  useEffect(() => { localStorage.setItem('sanctuary_verses', JSON.stringify(verses)); }, [verses]);
-  useEffect(() => { localStorage.setItem('sanctuary_reflections', JSON.stringify(reflections)); }, [reflections]);
-  useEffect(() => { localStorage.setItem('sanctuary_bucket', JSON.stringify(bucketList)); }, [bucketList]);
-  useEffect(() => { localStorage.setItem('sanctuary_quiz', JSON.stringify(quizCards)); }, [quizCards]);
-  useEffect(() => { localStorage.setItem('sanctuary_quiz_sets', JSON.stringify(quizSets)); }, [quizSets]);
 
-  // Load from Database & Subscribe to Realtime Updates
-  useEffect(() => {
-    async function loadDbData() {
-      const letters = await getTableData('daily_letters', initialDailyLetters);
-      if (letters && letters.length) setDailyLetters(letters);
-
-      const chs = await getTableData('chapters', initialChapters);
-      if (chs && chs.length) setChapters(chs);
-
-      const evs = await getTableData('calendar_events', initialCalendarEvents);
-      if (evs && evs.length) setCalendarEvents(evs);
-
-      const lts = await getTableData('little_things', initialLittleThings);
-      if (lts && lts.length) setLittleThings(lts);
-
-      const sgs = await getTableData('songs', initialSongs);
-      if (sgs && sgs.length) setSongs(sgs);
-
-      const albs = await getTableData('photo_albums', initialPhotoAlbums);
-      if (albs && albs.length) setPhotoAlbums(albs);
-
-      const bks = await getTableData('bucket_list', initialBucketList);
-      if (bks && bks.length) setBucketList(bks);
-
-      const refs = await getTableData('reflections', initialReflections);
-      if (refs && refs.length) setReflections(refs);
-    }
-
-    loadDbData();
-
-    const unsubLetters = subscribeToTable<DailyLetter>('daily_letters', setDailyLetters);
-    const unsubChapters = subscribeToTable<Chapter>('chapters', setChapters);
-    const unsubEvents = subscribeToTable<CalendarEvent>('calendar_events', setCalendarEvents);
-    const unsubLittleThings = subscribeToTable<LittleThing>('little_things', setLittleThings);
-    const unsubSongs = subscribeToTable<Song>('songs', setSongs);
-    const unsubAlbums = subscribeToTable<PhotoAlbum>('photo_albums', setPhotoAlbums);
-    const unsubBucket = subscribeToTable<BucketListItem>('bucket_list', setBucketList);
-    const unsubReflections = subscribeToTable<SharedReflection>('reflections', setReflections);
-
-    return () => {
-      unsubLetters();
-      unsubChapters();
-      unsubEvents();
-      unsubLittleThings();
-      unsubSongs();
-      unsubAlbums();
-      unsubBucket();
-      unsubReflections();
-    };
-  }, []);
-
-  // Handler functions
   const handleUpdateMood = (partner: 'sofs' | 'mumu', newMood: string) => {
     setProfiles({
       ...profiles,
       [partner]: { ...profiles[partner], currentMood: newMood }
+    });
+    addEcho({
+      type: 'quote',
+      title: `${partner === 'sofs' ? 'Sofs' : 'Mumu'} updated current mood`,
+      subtitle: `"${newMood}"`,
+      author: partner
     });
   };
 
   const handleAddChapter = (newChapter: Omit<Chapter, 'id'>) => {
     const chapter: Chapter = { ...newChapter, id: `ch-${Date.now()}` };
     setChapters([chapter, ...chapters]);
-    upsertTableItem('chapters', chapter);
+    const authorKey = newChapter.author === 'both' ? 'mumu' : newChapter.author;
+    addEcho({
+      type: 'chapter',
+      title: `Recorded Chapter ${chapter.chapterNumber}: ${chapter.title}`,
+      subtitle: `${chapter.location} • ${chapter.date}`,
+      author: authorKey,
+      imageUrl: chapter.coverImage
+    });
   };
 
   const handleUpdateChapter = (id: string, updated: Omit<Chapter, 'id'>) => {
-    const chapter = { ...updated, id };
-    setChapters(chapters.map(c => c.id === id ? chapter : c));
-    upsertTableItem('chapters', chapter);
+    setChapters(chapters.map(c => c.id === id ? { ...updated, id } : c));
+    const authorKey = updated.author === 'both' ? 'sofs' : updated.author;
+    addEcho({
+      type: 'chapter',
+      title: `Updated Chapter ${updated.chapterNumber}: ${updated.title}`,
+      subtitle: `${updated.location} • ${updated.date}`,
+      author: authorKey,
+      imageUrl: updated.coverImage
+    });
   };
 
   const handleDeleteChapter = (id: string) => {
     setChapters(chapters.filter(c => c.id !== id));
-    deleteTableItem('chapters', id);
   };
 
   const handleAddCalendarEvent = (newEvent: Omit<CalendarEvent, 'id'>) => {
     const ev: CalendarEvent = { ...newEvent, id: `ev-${Date.now()}` };
     setCalendarEvents([...calendarEvents, ev]);
-    upsertTableItem('calendar_events', ev);
+    addEcho({
+      type: 'memory',
+      title: `Scheduled Event: ${ev.title}`,
+      subtitle: `${ev.date} ${ev.time ? 'at ' + ev.time : ''} • ${ev.category}`,
+      author: 'mumu'
+    });
   };
 
   const handleUpdateCalendarEvent = (id: string, updated: Omit<CalendarEvent, 'id'>) => {
-    const ev = { ...updated, id };
-    setCalendarEvents(calendarEvents.map(e => e.id === id ? ev : e));
-    upsertTableItem('calendar_events', ev);
+    setCalendarEvents(calendarEvents.map(e => e.id === id ? { ...updated, id } : e));
   };
 
   const handleDeleteCalendarEvent = (id: string) => {
     setCalendarEvents(calendarEvents.filter(e => e.id !== id));
-    deleteTableItem('calendar_events', id);
   };
 
   const handleToggleEventCompleted = (id: string) => {
-    const updated = calendarEvents.map(e => e.id === id ? { ...e, isCompleted: !e.isCompleted } : e);
-    setCalendarEvents(updated);
-    const target = updated.find(e => e.id === id);
-    if (target) upsertTableItem('calendar_events', target);
+    setCalendarEvents(calendarEvents.map(e => e.id === id ? { ...e, isCompleted: !e.isCompleted } : e));
   };
 
   const handleAddLittleThing = (newThing: Omit<LittleThing, 'id'>) => {
     const lt: LittleThing = { ...newThing, id: `lt-${Date.now()}` };
     setLittleThings([lt, ...littleThings]);
-    upsertTableItem('little_things', lt);
+    addEcho({
+      type: 'memory',
+      title: `Added Little Detail: "${lt.title}"`,
+      subtitle: lt.details ? lt.details.slice(0, 50) + '...' : lt.subtitle || `Category: ${lt.category}`,
+      author: lt.addedBy
+    });
   };
 
   const handleDeleteLittleThing = (id: string) => {
     setLittleThings(littleThings.filter(l => l.id !== id));
-    deleteTableItem('little_things', id);
   };
 
   const handleAddSong = (newSong: Omit<Song, 'id'>) => {
     const s: Song = { ...newSong, id: `sg-${Date.now()}` };
     setSongs([s, ...songs]);
-    upsertTableItem('songs', s);
+    addEcho({
+      type: 'song',
+      title: `Added Track: "${s.title}"`,
+      subtitle: `${s.artist} • ${s.moodTags?.[0] || 'Soundtrack'}`,
+      author: s.addedBy || 'sofs',
+      imageUrl: s.coverUrl
+    });
   };
 
   const handleDeleteSong = (id: string) => {
     setSongs(songs.filter(s => s.id !== id));
-    deleteTableItem('songs', id);
   };
-
 
   const handleAddPhotoToAlbum = (albumId: string, newPhoto: Omit<PhotoItem, 'id'>) => {
     const p: PhotoItem = { ...newPhoto, id: `p-${Date.now()}` };
+    const targetAlbum = photoAlbums.find(a => a.id === albumId);
     setPhotoAlbums(photoAlbums.map(a => {
       if (a.id === albumId) {
         return {
@@ -324,6 +332,13 @@ export default function App() {
       }
       return a;
     }));
+    addEcho({
+      type: 'photo',
+      title: `Uploaded new memory photo`,
+      subtitle: p.caption || `Added to "${targetAlbum?.title || 'Photo Vault'}"`,
+      author: p.addedBy === 'both' ? 'sofs' : p.addedBy || 'sofs',
+      imageUrl: p.url
+    });
   };
 
   const handleCreateAlbum = (newAlbum: Omit<PhotoAlbum, 'id' | 'photoCount' | 'photos'>) => {
@@ -334,6 +349,13 @@ export default function App() {
       photos: []
     };
     setPhotoAlbums([...photoAlbums, alb]);
+    addEcho({
+      type: 'photo',
+      title: `Created Photo Album: "${alb.title}"`,
+      subtitle: `${alb.category} • Album created`,
+      author: 'both',
+      imageUrl: alb.coverUrl
+    });
   };
 
   const handleDeleteAlbum = (albumId: string) => {
@@ -366,6 +388,13 @@ export default function App() {
   const handleAddMilestone = (newMs: Omit<TimelineMilestone, 'id'>) => {
     const ms: TimelineMilestone = { ...newMs, id: `tm-${Date.now()}` };
     setMilestones([ms, ...milestones]);
+    addEcho({
+      type: 'memory',
+      title: `Recorded Milestone: ${ms.title}`,
+      subtitle: `${ms.date} • ${ms.location}`,
+      author: 'both',
+      imageUrl: ms.photoUrl
+    });
   };
 
   const handleDeleteMilestone = (id: string) => {
@@ -388,57 +417,55 @@ export default function App() {
   const handleAddReflectionPrompt = (newPrompt: Omit<SharedReflection, 'id'>) => {
     const ref: SharedReflection = { ...newPrompt, id: `ref-${Date.now()}` };
     setReflections([ref, ...reflections]);
-    upsertTableItem('reflections', ref);
   };
 
   const handleUpdateReflection = (id: string, updated: Partial<SharedReflection>) => {
-    const newList = reflections.map(r => r.id === id ? { ...r, ...updated } : r);
-    setReflections(newList);
-    const target = newList.find(r => r.id === id);
-    if (target) upsertTableItem('reflections', target);
+    setReflections(reflections.map(r => r.id === id ? { ...r, ...updated } : r));
   };
 
   const handleDeleteReflection = (id: string) => {
     setReflections(reflections.filter(r => r.id !== id));
-    deleteTableItem('reflections', id);
   };
 
   const handleAddReflectionNote = (id: string, partner: 'mumu' | 'sofs', note: string) => {
-    const newList = reflections.map(r => {
+    setReflections(reflections.map(r => {
       if (r.id === id) {
         return partner === 'mumu' ? { ...r, mumuNote: note } : { ...r, sofsNote: note };
       }
       return r;
+    }));
+    addEcho({
+      type: 'quote',
+      title: `Added Spiritual Note`,
+      subtitle: `"${note.slice(0, 60)}..."`,
+      author: partner
     });
-    setReflections(newList);
-    const target = newList.find(r => r.id === id);
-    if (target) upsertTableItem('reflections', target);
   };
 
   const handleAddBucketItem = (newItem: Omit<BucketListItem, 'id'>) => {
     const b: BucketListItem = { ...newItem, id: `bk-${Date.now()}` };
     setBucketList([...bucketList, b]);
-    upsertTableItem('bucket_list', b);
+    addEcho({
+      type: 'memory',
+      title: `Added Dream Goal: "${b.title}"`,
+      subtitle: `Category: ${b.category}`,
+      author: 'both'
+    });
   };
 
   const handleToggleBucketStatus = (id: string) => {
-    const newList = bucketList.map(b => {
+    setBucketList(bucketList.map(b => {
       if (b.id === id) {
         const nextStatus = b.status === 'Completed' ? 'Planned' : 'Completed';
         return { ...b, status: nextStatus };
       }
       return b;
-    });
-    setBucketList(newList);
-    const target = newList.find(b => b.id === id);
-    if (target) upsertTableItem('bucket_list', target);
+    }));
   };
 
   const handleDeleteBucketItem = (id: string) => {
     setBucketList(bucketList.filter(b => b.id !== id));
-    deleteTableItem('bucket_list', id);
   };
-
 
   const handleAddQuizCard = (newCard: Omit<QuizCard, 'id'>) => {
     const qc: QuizCard = { ...newCard, id: `qz-${Date.now()}` };
@@ -520,7 +547,7 @@ export default function App() {
               setActiveTab={setActiveTab}
               featuredChapter={chapters[0] || initialChapters[0]}
               featuredSong={songs[0] || initialSongs[0]}
-              echoes={initialEchoes}
+              echoes={echoes}
               profiles={profiles}
               onOpenAddChapter={() => { setActiveTab('our-story'); setIsAddChapterModalOpen(true); }}
             />

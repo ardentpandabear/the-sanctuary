@@ -9,7 +9,8 @@ import {
   CheckCircle2, 
   Circle,
   Edit2,
-  Trash2
+  Trash2,
+  X
 } from 'lucide-react';
 import { CalendarEvent, CountdownItem } from '../types';
 
@@ -167,7 +168,7 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
         </button>
       </div>
 
-      {/* Dynamic Top 3 Upcoming Plans Cards */}
+      {/* Dynamic Top 3 Upcoming Plans Cards (Under Synchronized Rhythms) */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h3 className="text-xs uppercase tracking-widest font-semibold text-[#d4af37] flex items-center space-x-2">

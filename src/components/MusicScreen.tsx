@@ -4,8 +4,11 @@ import {
   Play, 
   Pause, 
   Plus, 
+  Heart, 
+  Sparkles, 
   Filter, 
   Trash2, 
+  Volume2, 
   Youtube, 
   ExternalLink, 
   Radio,
@@ -189,7 +192,6 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({
       reader.readAsDataURL(file);
     }
   };
-
   const [isModalFetching, setIsModalFetching] = useState(false);
   const [modalAutoFilledStatus, setModalAutoFilledStatus] = useState<string | null>(null);
 
@@ -564,7 +566,7 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({
                   <p className="text-xs text-[#a39780] truncate">{song.artist}</p>
                   <div className="flex items-center space-x-1">
                     {song.moodTags.map((tag, idx) => (
-                      <span key={idx} className="text-[9px] px-1.5 py-0.5 rounded bg-[#0e1017] text-[#d4af37]">
+                      <span key={idx} className="text-[9px] px-1.5 py-0.2 rounded bg-[#0e1017] text-[#d4af37]">
                         {tag}
                       </span>
                     ))}
@@ -593,7 +595,7 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({
       {/* Add Song Modal */}
       {isAddModalOpen && (
         <div className="fixed inset-0 bg-[#000000]/75 z-50 flex items-center justify-center p-4 backdrop-blur-md">
-          <div className="glass-panel max-w-md w-full p-6 sm:p-8 rounded-3xl border border-[#d4af37]/30 shadow-2xl space-y-4 relative max-h-[90vh] overflow-y-auto custom-scrollbar">
+          <div className="glass-panel max-w-md w-full p-6 sm:p-8 rounded-3xl border border-[#d4af37]/30 shadow-2xl space-y-4 relative">
             <button
               onClick={() => setIsAddModalOpen(false)}
               className="absolute top-4 right-4 text-[#a39780] hover:text-[#f3e7c4] text-xl font-bold cursor-pointer"
@@ -677,25 +679,27 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({
                   )}
                 </div>
 
-                <input
-                  type="url"
-                  value={sourceUrl}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setSourceUrl(val);
-                    if (val.includes('spotify.com/track') || val.includes('youtube.com/watch') || val.includes('youtu.be')) {
-                      handleFetchModalMetadata(val);
+                <div className="flex gap-2">
+                  <input
+                    type="url"
+                    value={sourceUrl}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setSourceUrl(val);
+                      if (val.includes('spotify.com/track') || val.includes('youtube.com/watch') || val.includes('youtu.be')) {
+                        handleFetchModalMetadata(val);
+                      }
+                    }}
+                    placeholder={
+                      sourceType === 'youtube' 
+                        ? 'https://www.youtube.com/watch?v=...' 
+                        : sourceType === 'spotify' 
+                        ? 'https://open.spotify.com/track/...' 
+                        : 'https://...'
                     }
-                  }}
-                  placeholder={
-                    sourceType === 'youtube' 
-                      ? 'https://www.youtube.com/watch?v=...' 
-                      : sourceType === 'spotify' 
-                      ? 'https://open.spotify.com/track/...' 
-                      : 'https://...'
-                  }
-                  className="w-full px-3 py-2 rounded-xl bg-[#0e1017] border border-[#d4af37]/30 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#d4af37]"
-                />
+                    className="w-full px-3 py-2 rounded-xl bg-[#0e1017] border border-[#d4af37]/30 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#d4af37]"
+                  />
+                </div>
 
                 {modalAutoFilledStatus && (
                   <p className="text-[10px] text-emerald-400 font-medium flex items-center space-x-1">
@@ -772,6 +776,18 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({
                   placeholder="Cozy, Nostalgic, Late Night"
                   className="w-full px-3 py-2 rounded-xl bg-[#0e1017] border border-[#d4af37]/30 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#d4af37]"
                 />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-[#a39780] mb-1">Added By *</label>
+                <select
+                  value={addedBy}
+                  onChange={(e) => setAddedBy(e.target.value as 'sofs' | 'mumu')}
+                  className="w-full px-3 py-2 rounded-xl bg-[#0e1017] border border-[#d4af37]/30 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#d4af37]"
+                >
+                  <option value="sofs">Sofs 💖</option>
+                  <option value="mumu">Mumu 💙</option>
+                </select>
               </div>
 
               <div>

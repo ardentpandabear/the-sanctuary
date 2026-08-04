@@ -43,7 +43,7 @@ const CITIES: { [key: string]: CityData } = {
     timezone: 'Asia/Kolkata',
     lat: 25.4358,
     lon: 81.8463,
-    partnerTag: 'Mumu’ City',
+    partnerTag: 'Sofs’ City',
     defaultTemp: 32,
     defaultCondition: 'Sunny & Warm',
     defaultHumidity: 62,
@@ -58,7 +58,7 @@ const CITIES: { [key: string]: CityData } = {
     timezone: 'Europe/London',
     lat: 52.4862,
     lon: -1.8904,
-    partnerTag: 'Sofs’ City',
+    partnerTag: 'Mumu’ City',
     defaultTemp: 18,
     defaultCondition: 'Partly Cloudy',
     defaultHumidity: 74,
@@ -301,7 +301,7 @@ export const CityTimeWeatherWidget: React.FC = () => {
         <div>
           <div className="inline-flex items-center space-x-2 text-xs text-[#d4af37] font-semibold uppercase tracking-wider mb-1">
             <Clock className="w-4 h-4" />
-            <span>Dual World Clocks & Live Climate</span>
+            <span>Dual World Clocks &amp; Live Climate</span>
           </div>
           <h3 className="text-xl sm:text-2xl font-display font-semibold text-[#fff8e7] flex items-center gap-2">
             Allahabad <span className="text-[#d4af37] font-serif italic text-base">vs</span> Birmingham
