@@ -30,8 +30,8 @@ export const Header: React.FC<HeaderProps> = ({
   onUpdateMood,
   hasUnreadLetter = false
 }) => {
-  const [londonTime, setLondonTime] = useState('');
-  const [nyTime, setNyTime] = useState('');
+  const [birminghamTime, setBirminghamTime] = useState("");
+const [allahabadTime, setAllahabadTime] = useState("");
   const [editingMoodFor, setEditingMoodFor] = useState<'sofs' | 'mumu' | null>(null);
   const [moodInput, setMoodInput] = useState('');
 
@@ -85,19 +85,32 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   useEffect(() => {
-    const updateTimes = () => {
-      const now = new Date();
-      setLondonTime(
-        now.toLocaleTimeString('en-GB', { timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit' })
-      );
-      setNyTime(
-        now.toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', hour12: true })
-      );
-    };
-    updateTimes();
-    const interval = setInterval(updateTimes, 10000);
-    return () => clearInterval(interval);
-  }, []);
+  const updateTimes = () => {
+    const now = new Date();
+
+    setBirminghamTime(
+      now.toLocaleTimeString("en-GB", {
+        timeZone: "Europe/London",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    );
+
+    setAllahabadTime(
+      now.toLocaleTimeString("en-IN", {
+        timeZone: "Asia/Kolkata",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      })
+    );
+  };
+
+  updateTimes();
+  const interval = setInterval(updateTimes, 10000);
+
+  return () => clearInterval(interval);
+}, []);
 
   const getPageTitle = (tab: ActiveTab) => {
     switch (tab) {
@@ -171,14 +184,14 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="hidden xl:flex items-center space-x-3 px-3.5 py-1.5 rounded-full bg-[#141620]/80 border border-[#d4af37]/15 text-xs text-[#c8bfab]">
             <div className="flex items-center space-x-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-[#a39780] font-medium">London:</span>
-              <span className="font-mono text-[#f3e7c4] font-semibold">{londonTime || '15:42'}</span>
+              <span className="text-[#a39780] font-medium">Birmingham:</span>
+              <span className="font-mono text-[#f3e7c4] font-semibold">{birminghamTime || '15:42'}</span>
             </div>
             <span className="text-[#4a4234]">|</span>
             <div className="flex items-center space-x-1.5">
               <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-              <span className="text-[#a39780] font-medium">NY:</span>
-              <span className="font-mono text-[#f3e7c4] font-semibold">{nyTime || '10:42'}</span>
+              <span className="text-[#a39780] font-medium">Allahabad:</span>
+              <span className="font-mono text-[#f3e7c4] font-semibold">{allahabadTime || '15:42'}</span>
             </div>
           </div>
 

@@ -155,7 +155,7 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
           </div>
           <h2 className="text-2xl sm:text-3xl font-display font-semibold text-[#fff8e7]">Synchronized Rhythms</h2>
           <p className="text-xs sm:text-sm font-serif italic text-[#c8bfab]">
-            Safar - Rabi' al-Awwal 1448 • London &amp; New York Time
+            Safar - Rabi' al-Awwal 1448 • London &amp; Allahabad Time
           </p>
         </div>
 

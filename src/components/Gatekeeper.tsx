@@ -11,17 +11,16 @@ export const Gatekeeper: React.FC<GatekeeperProps> = ({ onUnlock }) => {
   const [error, setError] = useState(false);
   const [showHint, setShowHint] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Allow 'love', 'mumu', 'sofs', '1234', 'sanctuary', or empty enter for convenient demo
-    const validKeys = ['love', 'mumu', 'sofs', 'sanctuary', '1234', 'forever', ''];
-    if (validKeys.includes(passcode.trim().toLowerCase()) || passcode.length >= 0) {
-      setError(false);
-      onUnlock();
-    } else {
-      setError(true);
-    }
-  };
+const handleSubmit = (e: React.FormEvent) => {
+  e.preventDefault();
+
+  if (passcode.trim().toLowerCase() === "milk&mocha") {
+    setError(false);
+    onUnlock();
+  } else {
+    setError(true);
+  }
+};
 
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center p-4 sm:p-6 overflow-hidden bg-[#0a0b0e] text-[#f3e7c4]">
@@ -73,7 +72,7 @@ export const Gatekeeper: React.FC<GatekeeperProps> = ({ onUnlock }) => {
                     setPasscode(e.target.value);
                     setError(false);
                   }}
-                  placeholder="Passcode key (e.g. love)..."
+                  placeholder="Enter the secret key..."
                   className={`w-full px-4 py-3 rounded-xl bg-[#0e0f14]/80 border ${
                     error ? 'border-rose-500/60 focus:ring-rose-500/50' : 'border-[#d4af37]/30 focus:border-[#d4af37] focus:ring-[#d4af37]/30'
                   } text-[#fff8e7] placeholder-[#6b6251] focus:outline-none focus:ring-2 transition text-center tracking-widest text-lg font-mono`}
@@ -81,10 +80,10 @@ export const Gatekeeper: React.FC<GatekeeperProps> = ({ onUnlock }) => {
                 <KeyRound className="absolute right-3.5 top-3.5 w-5 h-5 text-[#8c8068] pointer-events-none" />
               </div>
               {error && (
-                <p className="text-xs text-rose-400 mt-2">
-                  Incorrect key. Try <span className="underline cursor-pointer" onClick={() => setPasscode('love')}>love</span> or leave blank.
-                </p>
-              )}
+  <p className="text-xs text-rose-400 mt-2">
+    That key doesn't belong to our story.😔🥺
+  </p>
+)}
             </div>
 
             <button
@@ -102,7 +101,9 @@ export const Gatekeeper: React.FC<GatekeeperProps> = ({ onUnlock }) => {
               onClick={() => setShowHint(!showHint)}
               className="hover:text-[#d4af37] transition underline cursor-pointer"
             >
-              {showHint ? 'Key: "love" or press Enter' : 'Forgot key?'}
+              {showHint
+  ? "Hint: 🐻‍❄️🐻"
+  : "Need a little hint?"}
             </button>
             <div className="flex items-center space-x-1 text-[#d4af37]/80">
               <Heart className="w-3.5 h-3.5 fill-[#d4af37]/30 text-[#d4af37]" />
