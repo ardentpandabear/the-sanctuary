@@ -105,7 +105,6 @@ export const initialCalendarEvents: CalendarEvent[] = [
     title: 'FaceTime Candlelight Dinner Date',
     date: '2026-08-15',
     time: '8:00 PM',
-    category: 'date-night',
     notes: 'We both order Italian food and light jasmine candles.',
     isCompleted: false
   },
@@ -114,7 +113,6 @@ export const initialCalendarEvents: CalendarEvent[] = [
     title: 'Sofs & Mumu Reunion Flight',
     date: '2026-08-28',
     time: '02:30 PM',
-    category: 'travel',
     notes: 'LHR to JFK flight arriving in New York for 2 weeks together!',
     isCompleted: false
   },
@@ -123,7 +121,6 @@ export const initialCalendarEvents: CalendarEvent[] = [
     title: 'Mumu’s Birthday Surprise',
     date: '2026-09-24',
     time: '12:00 AM',
-    category: 'special',
     notes: 'Special care package with handwritten letters arriving in NY.',
     isCompleted: false
   },
@@ -132,7 +129,6 @@ export const initialCalendarEvents: CalendarEvent[] = [
     title: 'Our 3rd Anniversary Trip to Kyoto',
     date: '2026-10-14',
     time: '10:00 AM',
-    category: 'anniversary',
     notes: 'Flight booked to Kyoto! Looking forward to autumn leaves.',
     isCompleted: false
   },
@@ -140,7 +136,6 @@ export const initialCalendarEvents: CalendarEvent[] = [
     id: 'ev-5',
     title: 'First Day of Ramadan',
     date: '2027-03-09',
-    category: 'faith',
     hijriDate: '1 Ramadan 1448',
     notes: 'Shared Suhoor video call & daily Juz reading schedule.',
     isCompleted: false
