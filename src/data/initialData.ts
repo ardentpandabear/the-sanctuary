@@ -16,13 +16,15 @@ import {
   EchoItem,
   DailyLetter
 } from '../types';
+import pp from './pp.jpg';
+import sofsImg from './WhatsApp Image 2024-06-05 at 11.30.51 PM.jpg';
 
 export const initialProfiles: { sofs: PartnerProfile; mumu: PartnerProfile } = {
   sofs: {
     id: 'sofs',
     name: 'Sofs',
     nickname: 'My Star',
-    avatar: './WhatsApp Image 2024-06-05 at 11.30.51 PM.jpg',
+    avatar: sofsImg,
     location: 'London, UK',
     timezone: 'GMT+0',
     currentMood: 'Sipping warm chai & thinking of you',
@@ -32,7 +34,7 @@ export const initialProfiles: { sofs: PartnerProfile; mumu: PartnerProfile } = {
     id: 'mumu',
     name: 'Mumu',
     nickname: 'My Everything',
-    avatar: './pp.jpg',
+    avatar: pp,
     location: 'Allahabad, India',
     timezone: 'IST-5.5',
     currentMood: 'Counting down the days till next month',

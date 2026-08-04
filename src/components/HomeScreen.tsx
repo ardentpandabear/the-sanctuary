@@ -131,7 +131,7 @@ const daysLeft = Math.ceil(birthdayDiff / (1000 * 60 * 60 * 24));
             <div className="text-2xl sm:text-3xl font-display font-bold text-[#fff8e7]">
               {daysToAnniv} <span className="text-sm font-sans font-normal text-[#d4af37]">Days Away</span>
             </div>
-            <p className="text-xs text-[#a39780] mt-0.5">Next Anniversary (June 5, 2026)</p>
+            <p className="text-xs text-[#a39780] mt-0.5">Next Anniversary (June 5, 2027)</p>
           </div>
         </div>
 
