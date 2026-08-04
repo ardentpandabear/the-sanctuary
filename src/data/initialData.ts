@@ -16,15 +16,13 @@ import {
   EchoItem,
   DailyLetter
 } from '../types';
-import pp from "../assets/pp.jpg";
-import sofsImg from "../assets/pps.jpeg";
 
 export const initialProfiles: { sofs: PartnerProfile; mumu: PartnerProfile } = {
   sofs: {
     id: 'sofs',
     name: 'Sofs',
     nickname: 'My Star',
-    avatar: sofsImg,
+    avatar: 'https://unsplash.com/photos/a-white-teddy-bear-sitting-on-a-pink-background-oRjW4G_hl9A',
     location: 'London, UK',
     timezone: 'GMT+0',
     currentMood: 'Sipping warm chai & thinking of you',
@@ -34,7 +32,7 @@ export const initialProfiles: { sofs: PartnerProfile; mumu: PartnerProfile } = {
     id: 'mumu',
     name: 'Mumu',
     nickname: 'My Everything',
-    avatar: pp,
+    avatar: 'https://unsplash.com/photos/a-stuffed-bear-on-a-beach-dePZUxrSsHs',
     location: 'Allahabad, India',
     timezone: 'IST-5.5',
     currentMood: 'Counting down the days till next month',
