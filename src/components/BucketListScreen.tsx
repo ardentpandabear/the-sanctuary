@@ -174,7 +174,7 @@ export const BucketListScreen: React.FC<BucketListScreenProps> = ({
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g. Visit Autumn Gardens in Kyoto"
+                  placeholder="e.g. Visit Autumn Gardens"
                   className="w-full px-3 py-2 rounded-xl bg-[#0e1017] border border-[#d4af37]/30 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#d4af37]"
                 />
               </div>

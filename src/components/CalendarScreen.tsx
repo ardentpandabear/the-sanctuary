@@ -65,7 +65,7 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
 
   // Helper to calculate days left relative to August 2, 2026
   const calculateDaysLeft = (targetDateStr: string) => {
-    const today = new Date(2026, 7, 2); // August 2, 2026
+    const today = new Date(2026, 7, 4); // August 4, 2026
     today.setHours(0, 0, 0, 0);
 
     const [y, m, d] = targetDateStr.split('-').map(Number);
@@ -506,9 +506,9 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
                   onChange={(e) => setCategory(e.target.value as any)}
                   className="w-full px-3 py-2 rounded-xl bg-[#0e1017] border border-[#d4af37]/30 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#d4af37]"
                 >
-                  <option value="date-night">Date Night</option>
+                  <option value="date-night">Class</option>
                   <option value="travel">Travel</option>
-                  <option value="anniversary">Anniversary</option>
+                  <option value="anniversary">Outing</option>
                   <option value="faith">Faith / Ramadan</option>
                   <option value="special">Special</option>
                 </select>
