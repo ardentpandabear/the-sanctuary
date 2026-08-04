@@ -99,6 +99,54 @@ export const initialChapters: Chapter[] = [
   }
 ];
 
+export const initialCalendarEvents: CalendarEvent[] = [
+  {
+    id: 'ev-1',
+    title: 'FaceTime Candlelight Dinner Date',
+    date: '2026-08-15',
+    time: '8:00 PM',
+    category: 'reminder',
+    notes: 'We both order Italian food and light jasmine candles.',
+    isCompleted: false
+  },
+  {
+    id: 'ev-2',
+    title: 'Sofs & Mumu Reunion Flight',
+    date: '2026-08-28',
+    time: '02:30 PM',
+    category: 'reminder',
+    notes: 'LHR to JFK flight arriving in New York for 2 weeks together!',
+    isCompleted: false
+  },
+  {
+    id: 'ev-3',
+    title: 'Mumu’s Birthday Surprise',
+    date: '2026-09-24',
+    time: '12:00 AM',
+    category: 'reminder',
+    notes: 'Special care package with handwritten letters arriving in NY.',
+    isCompleted: false
+  },
+  {
+    id: 'ev-4',
+    title: 'Our 3rd Anniversary Trip to Kyoto',
+    date: '2026-10-14',
+    time: '10:00 AM',
+    category: 'reminder',
+    notes: 'Flight booked to Kyoto! Looking forward to autumn leaves.',
+    isCompleted: false
+  },
+  {
+    id: 'ev-5',
+    title: 'First Day of Ramadan',
+    date: '2027-03-09',
+    category: 'reminder',
+    hijriDate: '1 Ramadan 1448',
+    notes: 'Shared Suhoor video call & daily Juz reading schedule.',
+    isCompleted: false
+  }
+];
+
 export const initialCountdowns: CountdownItem[] = [
   {
     id: 'cd-1',
@@ -738,7 +786,7 @@ export const initialDailyLetters: DailyLetter[] = [
     from: 'mumu',
     to: 'sofs',
     title: 'My Dearest Sofs, Good Morning',
-    content: `My Love,\n\nAs the sun rises today, my first thought was your laugh from our call last night. No matter how many miles separate London and New York, every day with you feels like a blessing I never want to take for granted.\n\nThank you for being my constant anchor, my quiet joy, and my favorite person in every room. I am counting down every single minute until I hold your hand again.\n\nAlways and forever yours,\nMumu ❤️`,
+    content: `My Love,\n\nGood morninggggg.\n\nThank you for being my constant anchor, my quiet joy, and my favorite person in every room.\n\nAlways and forever yours,\nMumu ❤️`,
     createdAt: new Date().toISOString(),
     isRead: false,
     waxSealColor: '#d4af37',
@@ -746,12 +794,12 @@ export const initialDailyLetters: DailyLetter[] = [
     fontStyle: 'serif'
   },
   {
-    id: 'letter-today-sofs',
+    id: 'letter-today-mumu',
     date: new Date().toISOString().split('T')[0],
-    from: 'sofs',
-    to: 'mumu',
+    from: 'mumu',
+    to: 'sofs',
     title: 'To My Mumu, My Favorite Heart',
-    content: `My Dearest Mumu,\n\nI was listening to our playlist while sipping morning tea today and couldn't stop smiling thinking about you. Thank you for making distance feel so small with your endless warmth and sweet notes.\n\nDon't forget to eat a good lunch today! Sending you the warmest hug all the way across the Atlantic.\n\nWith all my love,\nSofs 🌸`,
+    content: `My Dearest sofs,\n\nI was listening to our playlist while sipping morning tea today and couldn't stop smiling thinking about you. Thank you for making distance feel so small with your endless warmth.\n\nDon't forget to eat a good lunch today! Sending you the warmest hug all the way across the Atlantic.\n\nWith all my love,\nMumu 🌸`,
     createdAt: new Date().toISOString(),
     isRead: true,
     waxSealColor: '#b91c1c',
@@ -764,7 +812,7 @@ export const initialDailyLetters: DailyLetter[] = [
     from: 'mumu',
     to: 'sofs',
     title: 'Thoughts Before Sleeping',
-    content: `My dearest Sofs,\n\nJust wanted to leave you this note so you wake up to a smile. I looked at our pictures from Richmond Park today and realized how lucky I am. Sleep peacefully my love.\n\nYour Mumu`,
+    content: `My dearest Sofs,\n\nJust wanted to leave you this note so you wake up to a smile. I looked at ur pictures on my home screen today and realized how lucky I am. Sleep peacefully my love.\n\nYour Mumu`,
     createdAt: new Date(Date.now() - 86400000).toISOString(),
     isRead: true,
     waxSealColor: '#d4af37',

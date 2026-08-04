@@ -462,7 +462,7 @@ const isToday =
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g. Anniversary Trip to Kyoto"
+                  placeholder="e.g. Dental appointment"
                   className="w-full px-3 py-2 rounded-xl bg-[#0e1017] border border-[#d4af37]/30 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#d4af37]"
                 />
               </div>
