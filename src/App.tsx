@@ -70,10 +70,7 @@ export default function App() {
   const [isAddChapterModalOpen, setIsAddChapterModalOpen] = useState(false);
 
   // Persistent State
-  const [profiles, setProfiles] = useState(() => {
-    const saved = localStorage.getItem('sanctuary_profiles');
-    return saved ? JSON.parse(saved) : initialProfiles;
-  });
+  const [profiles, setProfiles] = useState(initialProfiles);
 
   const [dailyLetters, setDailyLetters] = useState<DailyLetter[]>(() => {
     const saved = localStorage.getItem('sanctuary_daily_letters');
