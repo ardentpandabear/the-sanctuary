@@ -299,8 +299,12 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
               const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
               const dayEvents = events.filter(e => e.date === dateString);
 
-              const isToday = dayNum === 2 && month === 7 && year === 2026; // August 2, 2026 highlight
+              const today = new Date();
 
+const isToday =
+  dayNum === today.getDate() &&
+  month === today.getMonth() &&
+  year === today.getFullYear();
               return (
                 <div
                   key={dayNum}
