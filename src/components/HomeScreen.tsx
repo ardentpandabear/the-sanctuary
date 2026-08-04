@@ -39,29 +39,16 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   const [isPlayingSong, setIsPlayingSong] = useState(false);
   const [showMemoryModal, setShowMemoryModal] = useState(false);
 
-  // Calculate dynamic days since June 5, 2026
-  const firstMetDate = new Date('2026-06-05');
+  // Calculate dynamic days since October 14, 2021
+  const firstMetDate = new Date('2021-10-14');
   const now = new Date();
   const diffTime = Math.abs(now.getTime() - firstMetDate.getTime());
   const daysTogether = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  // Next Anniversary Jun 5
-  const nextAnniv = new Date(now.getFullYear(), 5, 5);
+  // Next Anniversary Oct 14
+  const nextAnniv = new Date(now.getFullYear(), 9, 14);
   if (now > nextAnniv) nextAnniv.setFullYear(now.getFullYear() + 1);
   const daysToAnniv = Math.ceil((nextAnniv.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-
-  // Calculate days until next Nov 7
-const today = new Date();
-
-let nextBirthday = new Date(today.getFullYear(), 10, 7); // Month is 0-indexed, so 10 = November
-
-// If this year's birthday has already passed, use next year's
-if (today > nextBirthday) {
-  nextBirthday = new Date(today.getFullYear() + 1, 10, 7);
-}
-
-const birthdayDiff = nextBirthday.getTime() - today.getTime();
-const daysLeft = Math.ceil(birthdayDiff / (1000 * 60 * 60 * 24));
 
   return (
     <div className="space-y-8 pb-12 animate-fade-in">
@@ -118,7 +105,7 @@ const daysLeft = Math.ceil(birthdayDiff / (1000 * 60 * 60 * 24));
             <div className="text-2xl sm:text-3xl font-display font-bold text-[#fff8e7]">
               {daysTogether.toLocaleString()} <span className="text-sm font-sans font-normal text-[#d4af37]">Days</span>
             </div>
-            <p className="text-xs text-[#a39780] mt-0.5">Since our first chat (Apr 20, 2026)</p>
+            <p className="text-xs text-[#a39780] mt-0.5">Since our first hello in London (Oct 14, 2021)</p>
           </div>
         </div>
 
@@ -131,29 +118,23 @@ const daysLeft = Math.ceil(birthdayDiff / (1000 * 60 * 60 * 24));
             <div className="text-2xl sm:text-3xl font-display font-bold text-[#fff8e7]">
               {daysToAnniv} <span className="text-sm font-sans font-normal text-[#d4af37]">Days Away</span>
             </div>
-            <p className="text-xs text-[#a39780] mt-0.5">Next Anniversary (June 5, 2025)</p>
+            <p className="text-xs text-[#a39780] mt-0.5">Next Anniversary (October 14, 2025)</p>
           </div>
         </div>
 
-{/* Next Birthday */}
-<div className="glass-panel p-5 rounded-2xl border border-[#d4af37]/20 flex items-center space-x-4">
-  <div className="w-12 h-12 rounded-2xl bg-[#1e1b15] border border-[#d4af37]/40 flex items-center justify-center text-[#d4af37] shadow-md">
-    <Compass className="w-6 h-6 text-[#d4af37]" />
-  </div>
-
-  <div>
-    <div className="text-2xl sm:text-3xl font-display font-bold text-[#fff8e7]">
-      {daysLeft}{" "}
-      <span className="text-sm font-sans font-normal text-[#d4af37]">
-        {daysLeft === 1 ? "Day" : "Days"}
-      </span>
-    </div>
-
-    <p className="text-xs text-[#a39780] mt-0.5">
-      Until Sof's Birthday 🎂
-    </p>
-  </div>
-</div>
+        {/* Next Meeting */}
+        <div className="glass-panel p-5 rounded-2xl border border-[#d4af37]/20 flex items-center space-x-4">
+          <div className="w-12 h-12 rounded-2xl bg-[#1e1b15] border border-[#d4af37]/40 flex items-center justify-center text-[#d4af37] shadow-md">
+            <Compass className="w-6 h-6 text-[#d4af37]" />
+          </div>
+          <div>
+            <div className="text-2xl sm:text-3xl font-display font-bold text-[#fff8e7]">
+              26 <span className="text-sm font-sans font-normal text-[#d4af37]">Days</span>
+            </div>
+            <p className="text-xs text-[#a39780] mt-0.5">Until London Reunion Flight ✈️</p>
+          </div>
+        </div>
+      </div>
 
       {/* Dual City Time & Temperature Widget (Allahabad & Birmingham) */}
       <CityTimeWeatherWidget />
@@ -227,50 +208,60 @@ const daysLeft = Math.ceil(birthdayDiff / (1000 * 60 * 60 * 24));
           </div>
         </div>
 
-  {/* Right Column: Music Player & Remember This Spotlight (5 cols) */}
-<div className="lg:col-span-5 space-y-6">
+        {/* Right Column: Music Player & Remember This Spotlight (5 cols) */}
+        <div className="lg:col-span-5 space-y-6">
+          
+          {/* Music Player Card */}
+          <div className="space-y-3">
+            <h3 className="text-lg font-display text-[#f3e7c4] flex items-center space-x-2">
+              <Music className="w-4 h-4 text-[#d4af37]" />
+              <span>Our Song Right Now</span>
+            </h3>
 
-  {/* Music Player Card */}
-  <div className="space-y-3">
-    <h3 className="text-lg font-display text-[#f3e7c4] flex items-center space-x-2">
-      <Music className="w-4 h-4 text-[#d4af37]" />
-      <span>Our Song Right Now</span>
-    </h3>
+            <div className="glass-panel p-5 rounded-3xl border border-[#d4af37]/20 relative overflow-hidden">
+              <div className="flex items-center space-x-4">
+                <div className="relative w-20 h-20 rounded-2xl overflow-hidden shrink-0 shadow-lg border border-[#d4af37]/30">
+                  <img
+                    src={featuredSong.coverUrl}
+                    alt={featuredSong.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    onClick={() => setIsPlayingSong(!isPlayingSong)}
+                    className="absolute inset-0 bg-[#000000]/40 flex items-center justify-center text-[#d4af37] hover:scale-110 transition cursor-pointer"
+                  >
+                    {isPlayingSong ? <Pause className="w-8 h-8 fill-[#d4af37]" /> : <Play className="w-8 h-8 fill-[#d4af37] ml-1" />}
+                  </button>
+                </div>
 
-    <div
-      onClick={() => setActiveTab("music")}
-      className="glass-panel p-5 rounded-3xl border border-[#d4af37]/20 relative overflow-hidden cursor-pointer hover:border-[#d4af37]/40 hover:scale-[1.01] transition-all duration-300"
-    >
-      <div className="flex items-center space-x-4">
-        <div className="w-20 h-20 rounded-2xl overflow-hidden shrink-0 shadow-lg border border-[#d4af37]/30">
-          <img
-            src={featuredSong.coverUrl}
-            alt={featuredSong.title}
-            className="w-full h-full object-cover"
-          />
-        </div>
+                <div className="space-y-1 overflow-hidden">
+                  <span className="px-2 py-0.5 rounded-full bg-[#d4af37]/15 text-[#d4af37] text-[10px] font-semibold">
+                    {featuredSong.moodTags[0]}
+                  </span>
+                  <h4 className="text-base font-display font-semibold text-[#fff8e7] truncate">
+                    {featuredSong.title}
+                  </h4>
+                  <p className="text-xs text-[#a39780]">{featuredSong.artist}</p>
+                </div>
+              </div>
 
-        <div className="space-y-1 overflow-hidden">
-          <span className="px-2 py-0.5 rounded-full bg-[#d4af37]/15 text-[#d4af37] text-[10px] font-semibold">
-            {featuredSong.moodTags[0]}
-          </span>
+              {/* Progress Bar Simulation */}
+              <div className="mt-4 space-y-1">
+                <div className="w-full h-1.5 rounded-full bg-[#1a1d29] overflow-hidden">
+                  <div className={`h-full bg-gradient-to-r from-[#d4af37] to-[#f3e7c4] transition-all duration-300 ${isPlayingSong ? 'w-2/3 animate-pulse' : 'w-1/3'}`} />
+                </div>
+                <div className="flex justify-between text-[10px] text-[#8c816d]">
+                  <span>1:24</span>
+                  <span>{featuredSong.duration}</span>
+                </div>
+              </div>
 
-          <h4 className="text-base font-display font-semibold text-[#fff8e7] truncate">
-            {featuredSong.title}
-          </h4>
+              <p className="text-xs font-serif italic text-[#c8bfab] mt-3 pt-3 border-t border-[#d4af37]/10 line-clamp-2">
+                "{featuredSong.storyNote}"
+              </p>
+            </div>
+          </div>
 
-          <p className="text-xs text-[#a39780]">
-            {featuredSong.artist}
-          </p>
-        </div>
-      </div>
-
-      <p className="text-xs font-serif italic text-[#c8bfab] mt-4 pt-4 border-t border-[#d4af37]/10 line-clamp-2">
-        "{featuredSong.storyNote}"
-      </p>
-    </div>
-  </div>
-</div>
           {/* Activity Feed Echoes */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
