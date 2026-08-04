@@ -72,20 +72,14 @@ export default function App() {
   // Persistent State
   const [profiles, setProfiles] = useState(initialProfiles);
 
-  const [dailyLetters, setDailyLetters] = useState<DailyLetter[]>(() => {
-    const saved = localStorage.getItem('sanctuary_daily_letters');
-    return saved ? JSON.parse(saved) : initialDailyLetters;
-  });
+  const [dailyLetters, setDailyLetters] = useState(initialDailyLetters);
 
   const [chapters, setChapters] = useState<Chapter[]>(() => {
     const saved = localStorage.getItem('sanctuary_chapters');
     return saved ? JSON.parse(saved) : initialChapters;
   });
 
-  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(() => {
-    const saved = localStorage.getItem('sanctuary_events');
-    return saved ? JSON.parse(saved) : initialCalendarEvents;
-  });
+  const [calendarEvents, setCalendarEvents] = useState(initialCalendarEvents);
 
   const [littleThings, setLittleThings] = useState<LittleThing[]>(() => {
     const saved = localStorage.getItem('sanctuary_little_things');
