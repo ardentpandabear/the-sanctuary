@@ -136,7 +136,7 @@ const daysLeft = Math.ceil(birthdayDiff / (1000 * 60 * 60 * 24));
         </div>
 
         {/* Next Birthday */} 
-        <div className="glass-panel p-5 rounded-2xl border border-[#d4af37]/20 flex items-center space-x-4"> <div className="w-12 h-12 rounded-2xl bg-[#1e1b15] border border-[#d4af37]/40 flex items-center justify-center text-[#d4af37] shadow-md"> <Compass className="w-6 h-6 text-[#d4af37]" /> </div> <div> <div className="text-2xl sm:text-3xl font-display font-bold text-[#fff8e7]"> {daysLeft}{" "} <span className="text-sm font-sans font-normal text-[#d4af37]"> {daysLeft === 1 ? "Day" : "Days"} </span> </div> <p className="text-xs text-[#a39780] mt-0.5"> Until Sof's Birthday 🎂 </p> </div> </div>
+        <div className="glass-panel p-5 rounded-2xl border border-[#d4af37]/20 flex items-center space-x-4"> <div className="w-12 h-12 rounded-2xl bg-[#1e1b15] border border-[#d4af37]/40 flex items-center justify-center text-[#d4af37] shadow-md"> <Compass className="w-6 h-6 text-[#d4af37]" /> </div> <div> <div className="text-2xl sm:text-3xl font-display font-bold text-[#fff8e7]"> {daysLeft}{" "} <span className="text-sm font-sans font-normal text-[#d4af37]"> {daysLeft === 1 ? "Day" : "Days"} </span> </div> <p className="text-xs text-[#a39780] mt-0.5"> Until Sof's Birthday 🎂 </p> </div> </div></div>
 
       {/* Dual City Time & Temperature Widget (Allahabad & Birmingham) */}
       <CityTimeWeatherWidget />
