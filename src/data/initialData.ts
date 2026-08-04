@@ -99,49 +99,6 @@ export const initialChapters: Chapter[] = [
   }
 ];
 
-export const initialCalendarEvents: CalendarEvent[] = [
-  {
-    id: 'ev-1',
-    title: 'FaceTime Candlelight Dinner Date',
-    date: '2026-08-15',
-    time: '8:00 PM',
-    notes: 'We both order Italian food and light jasmine candles.',
-    isCompleted: false
-  },
-  {
-    id: 'ev-2',
-    title: 'Sofs & Mumu Reunion Flight',
-    date: '2026-08-28',
-    time: '02:30 PM',
-    notes: 'LHR to JFK flight arriving in New York for 2 weeks together!',
-    isCompleted: false
-  },
-  {
-    id: 'ev-3',
-    title: 'Mumu’s Birthday Surprise',
-    date: '2026-09-24',
-    time: '12:00 AM',
-    notes: 'Special care package with handwritten letters arriving in NY.',
-    isCompleted: false
-  },
-  {
-    id: 'ev-4',
-    title: 'Our 3rd Anniversary Trip to Kyoto',
-    date: '2026-10-14',
-    time: '10:00 AM',
-    notes: 'Flight booked to Kyoto! Looking forward to autumn leaves.',
-    isCompleted: false
-  },
-  {
-    id: 'ev-5',
-    title: 'First Day of Ramadan',
-    date: '2027-03-09',
-    hijriDate: '1 Ramadan 1448',
-    notes: 'Shared Suhoor video call & daily Juz reading schedule.',
-    isCompleted: false
-  }
-];
-
 export const initialCountdowns: CountdownItem[] = [
   {
     id: 'cd-1',
