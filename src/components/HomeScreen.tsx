@@ -60,7 +60,7 @@ if (today > nextBirthday) {
   nextBirthday = new Date(today.getFullYear() + 1, 10, 7);
 }
 
-const diffTime = nextBirthday - today;
+const diffTime = nextBirthday.getTime() - today.getTime();
 const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
   return (
