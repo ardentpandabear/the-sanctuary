@@ -306,11 +306,6 @@ export default function App() {
     saveTableItem('daily_letters', updated);
   };
 
-  const handleDeleteLetter = (id: string) => {
-    setDailyLetters(dailyLetters.filter(l => l.id !== id));
-    deleteTableItem('daily_letters', id);
-  };
-
   const handleUpdateMood = (partner: 'sofs' | 'mumu', newMood: string) => {
     const updatedPartner = { ...profiles[partner], currentMood: newMood };
     const updatedProfiles = {
@@ -816,7 +811,6 @@ export default function App() {
         letters={dailyLetters}
         onSaveLetter={handleSaveDailyLetter}
         onMarkAsRead={handleMarkLetterAsRead}
-        onDeleteLetter={handleDeleteLetter}
         profiles={profiles}
       />
 

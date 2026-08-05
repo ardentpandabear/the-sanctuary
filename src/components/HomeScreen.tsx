@@ -274,20 +274,8 @@ const daysLeft = Math.ceil(birthdayDiff / (1000 * 60 * 60 * 24));
             </div>
 
             <div className="glass-panel p-4 rounded-3xl border border-[#d4af37]/15 space-y-2.5 max-h-88 overflow-y-auto custom-scrollbar">
-              {(() => {
-                const now = Date.now();
-                const recentEchoes = (echoes || []).filter(echo => {
-                  // Parse timestamp from id if it's in format echo-{timestamp}
-                  const match = echo.id.match(/echo-(\d+)$/);
-                  if (match) {
-                    const echoTime = parseInt(match[1], 10);
-                    return (now - echoTime) < 24 * 60 * 60 * 1000; // 24 hours
-                  }
-                  // Old preset echoes (id like echo-1, echo-2) — skip them (they have no real timestamp)
-                  return false;
-                });
-                return recentEchoes.length > 0 ? (
-                recentEchoes.map((echo) => {
+              {echoes && echoes.length > 0 ? (
+                echoes.map((echo) => {
                   const getEchoIcon = (type: EchoItem['type']) => {
                     switch (type) {
                       case 'chapter':
@@ -348,9 +336,7 @@ const daysLeft = Math.ceil(birthdayDiff / (1000 * 60 * 60 * 24));
                 <div className="text-center py-6 text-xs text-[#a39780] italic">
                   No echoes recorded yet. Actions across your sanctuary will automatically appear here!
                 </div>
-              );
-              })()
-              }
+              )}
             </div>
           </div>
 
