@@ -41,7 +41,7 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
   const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [time, setTime] = useState('08:00 PM');
   const [endTime, setEndTime] = useState('');
-  const [category, setCategory] = useState<'anniversary' | 'Class' | 'travel' | 'faith' | 'reminder' | 'special'>('Class');
+  const [category, setCategory] = useState<'Outing' | 'Class' | 'travel' | 'faith' | 'reminder' | 'special'>('Class');
   const [notes, setNotes] = useState('');
 
   const monthNames = [
@@ -130,7 +130,7 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
 
   const getCategoryBadgeStyle = (cat?: string) => {
     switch (cat) {
-      case 'anniversary':
+      case 'outing':
         return 'bg-amber-500/20 text-amber-300 border-amber-500/30';
       case 'travel':
         return 'bg-blue-500/20 text-blue-300 border-blue-500/30';
@@ -512,7 +512,7 @@ const isToday =
                 >
                   <option value="Class">Class</option>
                   <option value="travel">Travel</option>
-                  <option value="anniversary">Outing</option>
+                  <option value="outing">Outing</option>
                   <option value="faith">Faith / Ramadan</option>
                   <option value="special">Special</option>
                 </select>
