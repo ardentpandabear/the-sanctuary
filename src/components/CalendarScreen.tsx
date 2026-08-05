@@ -30,15 +30,15 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
   onDeleteEvent,
   onToggleEventCompleted
 }) => {
-  // Start calendar view at August 2026
-  const [currentDate, setCurrentDate] = useState(new Date(2026, 7, 1)); // Month index 7 = August
+  // Start calendar view at current month
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   // Add / Edit Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
 
   const [title, setTitle] = useState('');
-  const [date, setDate] = useState('2026-08-15');
+  const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [time, setTime] = useState('08:00 PM');
   const [endTime, setEndTime] = useState('');
   const [category, setCategory] = useState<'anniversary' | 'date-night' | 'travel' | 'faith' | 'reminder' | 'special'>('date-night');
@@ -63,9 +63,9 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
   const firstDayIndex = new Date(year, month, 1).getDay();
   const totalDays = new Date(year, month + 1, 0).getDate();
 
-  // Helper to calculate days left relative to August 2, 2026
+  // Helper to calculate days left relative to today
   const calculateDaysLeft = (targetDateStr: string) => {
-    const today = new Date(2026, 7, 4); // August 4, 2026
+    const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     const [y, m, d] = targetDateStr.split('-').map(Number);
