@@ -44,7 +44,7 @@ export interface CalendarEvent {
   date: string; // YYYY-MM-DD
   time?: string;
   endTime?: string;
-  category: 'anniversary' | 'date-night' | 'travel' | 'faith' | 'reminder' | 'special';
+  category: 'anniversary' | 'Class' | 'travel' | 'faith' | 'reminder' | 'special';
   hijriDate?: string;
   notes?: string;
   isCompleted?: boolean;
