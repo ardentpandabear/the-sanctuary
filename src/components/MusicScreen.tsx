@@ -465,7 +465,7 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({
             {/* Added By & External Link */}
             <div className="flex md:flex-col items-center md:items-end justify-between w-full md:w-auto gap-2 border-t md:border-t-0 md:border-l border-[#d4af37]/15 pt-3 md:pt-0 md:pl-6">
               <span className="text-xs text-[#d4af37] font-medium">
-                Added by {activeSong.addedBy === 'sofs' ? 'Sofs 💖' : 'Mumu 💙'}
+                On Repeat {activeSong.addedBy === '' ? '💖' : '💙'}
               </span>
               {activeSong.sourceUrl && (
                 <a

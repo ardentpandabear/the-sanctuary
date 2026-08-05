@@ -140,7 +140,7 @@ export const FamilyFriendsScreen: React.FC<FamilyFriendsScreenProps> = ({
               : 'text-[#a39780] border-transparent hover:text-[#f3e7c4]'
           }`}
         >
-          <span className="text-base">🇮🇳</span>
+          <span className="text-base">GB</span>
           <span>Sofs’ Circle ({sofsContactsCount})</span>
         </button>
 
@@ -152,7 +152,7 @@ export const FamilyFriendsScreen: React.FC<FamilyFriendsScreenProps> = ({
               : 'text-[#a39780] border-transparent hover:text-[#f3e7c4]'
           }`}
         >
-          <span className="text-base">🇬🇧</span>
+          <span className="text-base">IN</span>
           <span>Mumu’s Circle ({mumuContactsCount})</span>
         </button>
 

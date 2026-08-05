@@ -181,15 +181,6 @@ const [allahabadTime, setAllahabadTime] = useState("");
         {/* Right Side: World Clocks & Partner Avatars */}
         <div className="flex items-center justify-between md:justify-end space-x-3 sm:space-x-4">
           
-          {/* Cloud Sync Status Badge */}
-          <div 
-            className="hidden md:flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-[#141620]/80 border border-[#d4af37]/15 text-xs text-[#c8bfab]"
-            title={isSupabaseConfigured ? "Connected to Supabase - Live real-time syncing enabled" : "Operating in offline local storage mode. Add Supabase keys to .env to sync across devices."}
-          >
-            <span className={`w-2 h-2 rounded-full ${isSupabaseConfigured ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
-            <span className="text-[#a39780] font-medium">{isSupabaseConfigured ? 'Cloud Live' : 'Local Storage'}</span>
-          </div>
-
           {/* Live World Clocks Badge */}
           <div className="hidden xl:flex items-center space-x-3 px-3.5 py-1.5 rounded-full bg-[#141620]/80 border border-[#d4af37]/15 text-xs text-[#c8bfab]">
             <div className="flex items-center space-x-1.5">

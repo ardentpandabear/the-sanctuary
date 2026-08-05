@@ -13,7 +13,8 @@ import {
   RotateCcw,
   BookOpen,
   User,
-  Edit3
+  Edit3,
+  Trash2
 } from 'lucide-react';
 import { DailyLetter, PartnerProfile } from '../types';
 
@@ -23,6 +24,7 @@ interface LetterOfTheDayModalProps {
   letters: DailyLetter[];
   onSaveLetter: (letter: Omit<DailyLetter, 'id' | 'createdAt'>) => void;
   onMarkAsRead?: (letterId: string) => void;
+  onDeleteLetter?: (letterId: string) => void;
   profiles: { sofs: PartnerProfile; mumu: PartnerProfile };
 }
 
@@ -32,6 +34,7 @@ export const LetterOfTheDayModal: React.FC<LetterOfTheDayModalProps> = ({
   letters,
   onSaveLetter,
   onMarkAsRead,
+  onDeleteLetter,
   profiles
 }) => {
   if (!isOpen) return null;
@@ -484,6 +487,15 @@ export const LetterOfTheDayModal: React.FC<LetterOfTheDayModalProps> = ({
                       <span>Click to read full letter</span>
                       <Mail className="w-3 h-3 text-[#d4af37] group-hover:scale-110 transition" />
                     </div>
+                    {onDeleteLetter && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onDeleteLetter(letter.id); }}
+                        className="absolute top-2 right-2 p-1.5 rounded-lg text-[#8c816d] hover:text-rose-400 hover:bg-rose-950/40 transition opacity-0 group-hover:opacity-100"
+                        title="Delete this letter"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                   </div>
                 );
               })}
@@ -528,7 +540,16 @@ export const LetterOfTheDayModal: React.FC<LetterOfTheDayModalProps> = ({
                 {selectedArchiveLetter.content}
               </div>
 
-              <div className="flex justify-end pt-2">
+              <div className="flex justify-end gap-2 pt-2">
+                {onDeleteLetter && (
+                  <button
+                    onClick={() => { onDeleteLetter(selectedArchiveLetter.id); setSelectedArchiveLetter(null); }}
+                    className="px-4 py-2 rounded-xl bg-rose-900/40 border border-rose-500/30 text-rose-300 font-semibold text-xs hover:bg-rose-900/70 cursor-pointer flex items-center space-x-1.5"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Delete Letter</span>
+                  </button>
+                )}
                 <button
                   onClick={() => setSelectedArchiveLetter(null)}
                   className="px-4 py-2 rounded-xl bg-[#d4af37] text-[#0c0d12] font-semibold text-xs hover:brightness-110 cursor-pointer"
