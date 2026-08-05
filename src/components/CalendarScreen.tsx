@@ -41,7 +41,7 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
   const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [time, setTime] = useState('08:00 PM');
   const [endTime, setEndTime] = useState('');
-  const [category, setCategory] = useState<'anniversary' | 'date-night' | 'travel' | 'faith' | 'reminder' | 'special'>('date-night');
+  const [category, setCategory] = useState<'anniversary' | 'Class' | 'travel' | 'faith' | 'reminder' | 'special'>('Class');
   const [notes, setNotes] = useState('');
 
   const monthNames = [
@@ -89,7 +89,7 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
     setDate(initialDate || `${year}-${String(month + 1).padStart(2, '0')}-15`);
     setTime('08:00 PM');
     setEndTime('');
-    setCategory('date-night');
+    setCategory('Class');
     setNotes('');
     setIsModalOpen(true);
   };
@@ -136,7 +136,7 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
         return 'bg-blue-500/20 text-blue-300 border-blue-500/30';
       case 'faith':
         return 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
-      case 'date-night':
+      case 'Class':
         return 'bg-rose-500/20 text-rose-300 border-rose-500/30';
       default:
         return 'bg-purple-500/20 text-purple-300 border-purple-500/30';
@@ -510,7 +510,7 @@ const isToday =
                   onChange={(e) => setCategory(e.target.value as any)}
                   className="w-full px-3 py-2 rounded-xl bg-[#0e1017] border border-[#d4af37]/30 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#d4af37]"
                 >
-                  <option value="date-night">Class</option>
+                  <option value="Class">Class</option>
                   <option value="travel">Travel</option>
                   <option value="anniversary">Outing</option>
                   <option value="faith">Faith / Ramadan</option>
