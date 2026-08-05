@@ -71,14 +71,14 @@ export const FaithScreen: React.FC<FaithScreenProps> = ({
       onUpdateVerse(editingVerseId, {
         arabicText,
         englishTranslation,
-        reference: reference || 'Quran Verse',
+        reference: reference || '',
         personalNote
       });
     } else {
       onAddVerse({
         arabicText,
         englishTranslation,
-        reference: reference || 'Quran Verse',
+        reference: reference || '',
         personalNote
       });
     }
@@ -103,7 +103,7 @@ export const FaithScreen: React.FC<FaithScreenProps> = ({
 
   const handleOpenEditPrompt = (ref: SharedReflection) => {
     setEditingPromptId(ref.id);
-    setPromptDate(ref.date || 'Recent');
+    setPromptDate(ref.date || '');
     setPromptText(ref.prompt);
     setMumuAnswer(ref.mumuNote || '');
     setSofsAnswer(ref.sofsNote || '');
@@ -124,7 +124,7 @@ export const FaithScreen: React.FC<FaithScreenProps> = ({
     } else if (onAddReflectionPrompt) {
       onAddReflectionPrompt({
         prompt: promptText,
-        date: promptDate || 'Recent',
+        date: promptDate || '',
         mumuNote: mumuAnswer,
         sofsNote: sofsAnswer
       });

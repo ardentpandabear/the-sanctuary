@@ -37,7 +37,7 @@ export const BucketListScreen: React.FC<BucketListScreenProps> = ({
       category,
       title,
       description,
-      targetDate: targetDate || 'Someday soon',
+      targetDate: targetDate || '',
       status: 'Planned'
     });
 

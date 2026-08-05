@@ -18,7 +18,7 @@ export const TimelineScreen: React.FC<TimelineScreenProps> = ({
 
   const [title, setTitle] = useState('');
   const [date, setDate] = useState('');
-  const [year, setYear] = useState('2024');
+  const [year, setYear] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
   const [category, setCategory] = useState<TimelineMilestone['category']>('milestone');
@@ -50,14 +50,14 @@ export const TimelineScreen: React.FC<TimelineScreenProps> = ({
     if (!title || !description) return;
 
     onAddMilestone({
-      year: year || '2024',
-      date: date || 'October 2024',
+      year: year || '',
+      date: date || '',
       title,
       description,
       category,
-      location: location || 'London & NY',
+      location: location || '',
       photoUrl: photoUrl || undefined,
-      tag: tag || 'Milestone'
+      tag: tag || ''
     });
 
     setTitle('');

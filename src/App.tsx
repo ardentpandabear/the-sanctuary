@@ -91,59 +91,59 @@ export default function App() {
   );
 
   const [dailyLetters, setDailyLetters] = useState<DailyLetter[]>(() => 
-    getLocalCache('daily_letters', initialDailyLetters)
+    getLocalCache('daily_letters', [])
   );
 
   const [chapters, setChapters] = useState<Chapter[]>(() => 
-    getLocalCache('chapters', initialChapters)
+    getLocalCache('chapters', [])
   );
 
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(() => 
-    getLocalCache('calendar_events', initialCalendarEvents)
+    getLocalCache('calendar_events', [])
   );
 
   const [littleThings, setLittleThings] = useState<LittleThing[]>(() => 
-    getLocalCache('little_things', initialLittleThings)
+    getLocalCache('little_things', [])
   );
 
   const [songs, setSongs] = useState<Song[]>(() => 
-    getLocalCache('songs', initialSongs)
+    getLocalCache('songs', [])
   );
 
   const [photoAlbums, setPhotoAlbums] = useState<PhotoAlbum[]>(() => 
-    getLocalCache('photo_albums', initialPhotoAlbums)
+    getLocalCache('photo_albums', [])
   );
 
   const [contacts, setContacts] = useState<FamilyFriendContact[]>(() => 
-    getLocalCache('contacts', initialFamilyFriends)
+    getLocalCache('contacts', [])
   );
 
   const [milestones, setMilestones] = useState<TimelineMilestone[]>(() => 
-    getLocalCache('milestones', initialTimelineMilestones)
+    getLocalCache('milestones', [])
   );
 
   const [verses, setVerses] = useState<QuranVerse[]>(() => 
-    getLocalCache('verses', initialQuranVerses)
+    getLocalCache('verses', [])
   );
 
   const [reflections, setReflections] = useState<SharedReflection[]>(() => 
-    getLocalCache('reflections', initialReflections)
+    getLocalCache('reflections', [])
   );
 
   const [bucketList, setBucketList] = useState<BucketListItem[]>(() => 
-    getLocalCache('bucket_list', initialBucketList)
+    getLocalCache('bucket_list', [])
   );
 
   const [quizCards, setQuizCards] = useState<QuizCard[]>(() => 
-    getLocalCache('quiz_cards', initialQuizCards)
+    getLocalCache('quiz_cards', [])
   );
 
   const [quizSets, setQuizSets] = useState<QuizSet[]>(() => 
-    getLocalCache('quiz_sets', initialQuizSets)
+    getLocalCache('quiz_sets', [])
   );
 
   const [echoes, setEchoes] = useState<EchoItem[]>(() => 
-    getLocalCache('echoes', initialEchoes)
+    getLocalCache('echoes', [])
   );
 
   // Load from Supabase on mount & set up real-time subscribers
@@ -168,20 +168,20 @@ export default function App() {
         fetchedEchoes,
         fetchedProfilesData
       ] = await Promise.all([
-        getTableData<DailyLetter>('daily_letters', initialDailyLetters),
-        getTableData<Chapter>('chapters', initialChapters),
-        getTableData<CalendarEvent>('calendar_events', initialCalendarEvents),
-        getTableData<LittleThing>('little_things', initialLittleThings),
-        getTableData<Song>('songs', initialSongs),
-        getTableData<PhotoAlbum>('photo_albums', initialPhotoAlbums),
-        getTableData<FamilyFriendContact>('contacts', initialFamilyFriends),
-        getTableData<TimelineMilestone>('milestones', initialTimelineMilestones),
-        getTableData<QuranVerse>('verses', initialQuranVerses),
-        getTableData<SharedReflection>('reflections', initialReflections),
-        getTableData<BucketListItem>('bucket_list', initialBucketList),
-        getTableData<QuizCard>('quiz_cards', initialQuizCards),
-        getTableData<QuizSet>('quiz_sets', initialQuizSets),
-        getTableData<EchoItem>('echoes', initialEchoes),
+        getTableData<DailyLetter>('daily_letters', []),
+        getTableData<Chapter>('chapters', []),
+        getTableData<CalendarEvent>('calendar_events', []),
+        getTableData<LittleThing>('little_things', []),
+        getTableData<Song>('songs', []),
+        getTableData<PhotoAlbum>('photo_albums', []),
+        getTableData<FamilyFriendContact>('contacts', []),
+        getTableData<TimelineMilestone>('milestones', []),
+        getTableData<QuranVerse>('verses', []),
+        getTableData<SharedReflection>('reflections', []),
+        getTableData<BucketListItem>('bucket_list', []),
+        getTableData<QuizCard>('quiz_cards', []),
+        getTableData<QuizSet>('quiz_sets', []),
+        getTableData<EchoItem>('echoes', []),
         getTableData<PartnerProfile>('profiles', [initialProfiles.sofs, initialProfiles.mumu])
       ]);
 
@@ -200,7 +200,25 @@ export default function App() {
       if (fetchedBucket) setBucketList(fetchedBucket);
       if (fetchedQuizCards) setQuizCards(fetchedQuizCards);
       if (fetchedQuizSets) setQuizSets(fetchedQuizSets);
-      if (fetchedEchoes) setEchoes(fetchedEchoes);
+      
+      if (fetchedEchoes) {
+        // Discard preset echoes or echoes older than 24 hours (24 * 60 * 60 * 1000 ms)
+        const activeEchoes = fetchedEchoes.filter(echo => {
+          const tsNum = parseInt(echo.id.replace('echo-', ''), 10);
+          if (isNaN(tsNum)) {
+            // Preset echo like echo-1, remove it
+            deleteTableItem('echoes', echo.id);
+            return false;
+          }
+          const isExpired = Date.now() - tsNum > 24 * 60 * 60 * 1000;
+          if (isExpired) {
+            deleteTableItem('echoes', echo.id);
+            return false;
+          }
+          return true;
+        });
+        setEchoes(activeEchoes);
+      }
 
       if (fetchedProfilesData && fetchedProfilesData.length > 0) {
         const sofsP = fetchedProfilesData.find(p => p.id === 'sofs') || initialProfiles.sofs;
@@ -226,7 +244,14 @@ export default function App() {
       subscribeToTable<BucketListItem>('bucket_list', setBucketList),
       subscribeToTable<QuizCard>('quiz_cards', setQuizCards),
       subscribeToTable<QuizSet>('quiz_sets', setQuizSets),
-      subscribeToTable<EchoItem>('echoes', setEchoes),
+      subscribeToTable<EchoItem>('echoes', (data) => {
+        const active = (data || []).filter(echo => {
+          const tsNum = parseInt(echo.id.replace('echo-', ''), 10);
+          if (isNaN(tsNum)) return false;
+          return Date.now() - tsNum <= 24 * 60 * 60 * 1000;
+        });
+        setEchoes(active);
+      }),
       subscribeToTable<PartnerProfile>('profiles', data => {
         if (data && data.length > 0) {
           const sofsP = data.find(p => p.id === 'sofs') || initialProfiles.sofs;
@@ -304,6 +329,11 @@ export default function App() {
     const updated = { ...target, isRead: true };
     setDailyLetters(dailyLetters.map(l => l.id === id ? updated : l));
     saveTableItem('daily_letters', updated);
+  };
+
+  const handleDeleteDailyLetter = (id: string) => {
+    setDailyLetters(prev => prev.filter(l => l.id !== id));
+    deleteTableItem('daily_letters', id);
   };
 
   const handleUpdateMood = (partner: 'sofs' | 'mumu', newMood: string) => {
@@ -696,8 +726,8 @@ export default function App() {
           {activeTab === 'home' && (
             <HomeScreen
               setActiveTab={setActiveTab}
-              featuredChapter={chapters[0] || initialChapters[0]}
-              featuredSong={songs[0] || initialSongs[0]}
+              featuredChapter={chapters[0]}
+              featuredSong={songs[0]}
               echoes={echoes}
               profiles={profiles}
               onOpenAddChapter={() => { setActiveTab('our-story'); setIsAddChapterModalOpen(true); }}
@@ -811,6 +841,7 @@ export default function App() {
         letters={dailyLetters}
         onSaveLetter={handleSaveDailyLetter}
         onMarkAsRead={handleMarkLetterAsRead}
+        onDeleteLetter={handleDeleteDailyLetter}
         profiles={profiles}
       />
 

@@ -13,7 +13,8 @@ import {
   RotateCcw,
   BookOpen,
   User,
-  Edit3
+  Edit3,
+  Trash2
 } from 'lucide-react';
 import { DailyLetter, PartnerProfile } from '../types';
 
@@ -23,6 +24,7 @@ interface LetterOfTheDayModalProps {
   letters: DailyLetter[];
   onSaveLetter: (letter: Omit<DailyLetter, 'id' | 'createdAt'>) => void;
   onMarkAsRead?: (letterId: string) => void;
+  onDeleteLetter?: (letterId: string) => void;
   profiles: { sofs: PartnerProfile; mumu: PartnerProfile };
 }
 
@@ -32,6 +34,7 @@ export const LetterOfTheDayModal: React.FC<LetterOfTheDayModalProps> = ({
   letters,
   onSaveLetter,
   onMarkAsRead,
+  onDeleteLetter,
   profiles
 }) => {
   if (!isOpen) return null;
@@ -482,7 +485,23 @@ export const LetterOfTheDayModal: React.FC<LetterOfTheDayModalProps> = ({
 
                     <div className="flex justify-between items-center text-[10px] text-[#8c816d] pt-2 border-t border-[#d4af37]/10">
                       <span>Click to read full letter</span>
-                      <Mail className="w-3 h-3 text-[#d4af37] group-hover:scale-110 transition" />
+                      <div className="flex items-center space-x-2">
+                        {onDeleteLetter && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (window.confirm("Are you sure you want to delete this letter?")) {
+                                onDeleteLetter(letter.id);
+                              }
+                            }}
+                            title="Delete letter"
+                            className="p-1 rounded text-[#8c816d] hover:text-rose-400 hover:bg-rose-950/40 transition cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                        <Mail className="w-3 h-3 text-[#d4af37] group-hover:scale-110 transition" />
+                      </div>
                     </div>
                   </div>
                 );
@@ -528,7 +547,21 @@ export const LetterOfTheDayModal: React.FC<LetterOfTheDayModalProps> = ({
                 {selectedArchiveLetter.content}
               </div>
 
-              <div className="flex justify-end pt-2">
+              <div className="flex justify-between items-center pt-2">
+                {onDeleteLetter && (
+                  <button
+                    onClick={() => {
+                      if (window.confirm("Are you sure you want to delete this letter?")) {
+                        onDeleteLetter(selectedArchiveLetter.id);
+                        setSelectedArchiveLetter(null);
+                      }
+                    }}
+                    className="px-3.5 py-1.5 rounded-xl bg-rose-950/80 border border-rose-500/30 text-rose-200 hover:bg-rose-900 font-semibold text-xs cursor-pointer transition flex items-center space-x-1"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Delete Letter</span>
+                  </button>
+                )}
                 <button
                   onClick={() => setSelectedArchiveLetter(null)}
                   className="px-4 py-2 rounded-xl bg-[#d4af37] text-[#0c0d12] font-semibold text-xs hover:brightness-110 cursor-pointer"

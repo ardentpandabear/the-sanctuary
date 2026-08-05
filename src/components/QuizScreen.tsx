@@ -370,124 +370,125 @@ export const QuizScreen: React.FC<QuizScreenProps> = ({
 
       {/* CREATE 4-QUESTION QUIZ MODAL */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 bg-[#000000]/80 z-50 flex items-center justify-center p-4 backdrop-blur-md overflow-y-auto">
-          <div className="glass-panel max-w-2xl w-full p-6 sm:p-8 rounded-3xl border border-[#ff6b8b]/40 shadow-2xl space-y-6 relative my-8">
+        <div className="fixed inset-0 bg-[#000000]/80 z-50 flex items-center justify-center p-4 backdrop-blur-md">
+          <div className="glass-panel max-w-2xl w-full max-h-[90vh] flex flex-col p-6 sm:p-8 rounded-3xl border border-[#ff6b8b]/40 shadow-2xl relative my-auto">
             <button
               onClick={() => setIsCreateModalOpen(false)}
-              className="absolute top-4 right-4 text-[#a39780] hover:text-[#fff8e7] text-xl font-bold cursor-pointer"
+              className="absolute top-4 right-4 text-[#a39780] hover:text-[#fff8e7] text-xl font-bold cursor-pointer z-10"
             >
               &times;
             </button>
 
-            <div>
+            <div className="mb-4 shrink-0">
               <span className="text-xs text-[#ff6b8b] font-semibold uppercase tracking-widest block">Flamingo Cards Creator</span>
               <h3 className="text-2xl font-display text-[#fff8e7]">Set a New 4-Question Quiz</h3>
             </div>
 
-            <form onSubmit={handleCreateSubmit} className="space-y-6">
-              
-              {/* Quiz Pack Metadata */}
-              <div className="space-y-3 p-4 rounded-2xl bg-[#14101a] border border-[#ff6b8b]/20">
-                <div>
-                  <label className="block text-xs font-medium text-[#a39780] mb-1">Quiz Title *</label>
-                  <input
-                    type="text"
-                    required
-                    value={newTitle}
-                    onChange={(e) => setNewTitle(e.target.value)}
-                    placeholder="e.g. How Well Do You Know My Morning Routine?"
-                    className="w-full px-3 py-2 rounded-xl bg-[#0b090f] border border-[#ff6b8b]/30 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#ff6b8b]"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
+            <form onSubmit={handleCreateSubmit} className="flex flex-col flex-1 overflow-hidden">
+              <div className="flex-1 overflow-y-auto space-y-6 pr-2 mb-4 scrollbar-thin scrollbar-thumb-[#ff6b8b]/30">
+                {/* Quiz Pack Metadata */}
+                <div className="space-y-3 p-4 rounded-2xl bg-[#14101a] border border-[#ff6b8b]/20">
                   <div>
-                    <label className="block text-xs font-medium text-[#a39780] mb-1">Created By</label>
-                    <select
-                      value={createdBy}
-                      onChange={(e) => setCreatedBy(e.target.value as any)}
+                    <label className="block text-xs font-medium text-[#a39780] mb-1">Quiz Title *</label>
+                    <input
+                      type="text"
+                      required
+                      value={newTitle}
+                      onChange={(e) => setNewTitle(e.target.value)}
+                      placeholder="e.g. How Well Do You Know My Morning Routine?"
                       className="w-full px-3 py-2 rounded-xl bg-[#0b090f] border border-[#ff6b8b]/30 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#ff6b8b]"
-                    >
-                      <option value="sofs">Sofs 💖</option>
-                      <option value="mumu">Mumu 💙</option>
-                    </select>
+                    />
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-medium text-[#a39780] mb-1">Target Partner to Take It</label>
-                    <select
-                      value={targetFor}
-                      onChange={(e) => setTargetFor(e.target.value as any)}
-                      className="w-full px-3 py-2 rounded-xl bg-[#0b090f] border border-[#ff6b8b]/30 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#ff6b8b]"
-                    >
-                      <option value="mumu">Mumu (For Mumu to answer)</option>
-                      <option value="sofs">Sofs (For Sofs to answer)</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              {/* 4 Questions Builder */}
-              <div className="space-y-6">
-                <span className="text-xs font-semibold text-[#ff6b8b] uppercase tracking-wider block">
-                  Fill Out 4 MCQ Questions:
-                </span>
-
-                {[0, 1, 2, 3].map((qIdx) => (
-                  <div key={qIdx} className="p-4 rounded-2xl bg-[#14101a] border border-[#ff6b8b]/20 space-y-3">
-                    <div className="flex items-center justify-between text-xs text-[#ff6b8b] font-bold">
-                      <span>Question {qIdx + 1} of 4</span>
-                    </div>
-
+                  <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <input
-                        type="text"
-                        required
-                        value={qForms[qIdx].question}
-                        onChange={(e) => updateQForm(qIdx, 'question', e.target.value)}
-                        placeholder={`Question ${qIdx + 1}: e.g. What is my favorite tea snack?`}
+                      <label className="block text-xs font-medium text-[#a39780] mb-1">Created By</label>
+                      <select
+                        value={createdBy}
+                        onChange={(e) => setCreatedBy(e.target.value as any)}
                         className="w-full px-3 py-2 rounded-xl bg-[#0b090f] border border-[#ff6b8b]/30 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#ff6b8b]"
-                      />
-                    </div>
-
-                    {/* 4 Options Grid */}
-                    <div className="grid grid-cols-2 gap-2">
-                      {[0, 1, 2, 3].map((optIdx) => (
-                        <div key={optIdx} className="flex items-center space-x-1.5">
-                          <input
-                            type="radio"
-                            name={`correct-${qIdx}`}
-                            checked={qForms[qIdx].correctIndex === optIdx}
-                            onChange={() => updateQForm(qIdx, 'correctIndex', optIdx)}
-                            title="Mark as correct answer"
-                            className="accent-[#ff6b8b] cursor-pointer"
-                          />
-                          <input
-                            type="text"
-                            required
-                            value={qForms[qIdx].options[optIdx]}
-                            onChange={(e) => updateQOption(qIdx, optIdx, e.target.value)}
-                            placeholder={`Choice ${['A', 'B', 'C', 'D'][optIdx]}`}
-                            className="w-full px-2.5 py-1.5 rounded-lg bg-[#0b090f] border border-[#ff6b8b]/20 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#ff6b8b]"
-                          />
-                        </div>
-                      ))}
+                      >
+                        <option value="sofs">Sofs 💖</option>
+                        <option value="mumu">Mumu 💙</option>
+                      </select>
                     </div>
 
                     <div>
-                      <input
-                        type="text"
-                        value={qForms[qIdx].memoryDetail}
-                        onChange={(e) => updateQForm(qIdx, 'memoryDetail', e.target.value)}
-                        placeholder="Memory Detail / Explanation (revealed when answered)"
-                        className="w-full px-3 py-1.5 rounded-xl bg-[#0b090f] border border-[#ff6b8b]/20 text-xs text-[#c8bfab] focus:outline-none"
-                      />
+                      <label className="block text-xs font-medium text-[#a39780] mb-1">Target Partner to Take It</label>
+                      <select
+                        value={targetFor}
+                        onChange={(e) => setTargetFor(e.target.value as any)}
+                        className="w-full px-3 py-2 rounded-xl bg-[#0b090f] border border-[#ff6b8b]/30 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#ff6b8b]"
+                      >
+                        <option value="mumu">Mumu (For Mumu to answer)</option>
+                        <option value="sofs">Sofs (For Sofs to answer)</option>
+                      </select>
                     </div>
                   </div>
-                ))}
+                </div>
+
+                {/* 4 Questions Builder */}
+                <div className="space-y-6">
+                  <span className="text-xs font-semibold text-[#ff6b8b] uppercase tracking-wider block">
+                    Fill Out 4 MCQ Questions:
+                  </span>
+
+                  {[0, 1, 2, 3].map((qIdx) => (
+                    <div key={qIdx} className="p-4 rounded-2xl bg-[#14101a] border border-[#ff6b8b]/20 space-y-3">
+                      <div className="flex items-center justify-between text-xs text-[#ff6b8b] font-bold">
+                        <span>Question {qIdx + 1} of 4</span>
+                      </div>
+
+                      <div>
+                        <input
+                          type="text"
+                          required
+                          value={qForms[qIdx].question}
+                          onChange={(e) => updateQForm(qIdx, 'question', e.target.value)}
+                          placeholder={`Question ${qIdx + 1}: e.g. What is my favorite tea snack?`}
+                          className="w-full px-3 py-2 rounded-xl bg-[#0b090f] border border-[#ff6b8b]/30 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#ff6b8b]"
+                        />
+                      </div>
+
+                      {/* 4 Options Grid */}
+                      <div className="grid grid-cols-2 gap-2">
+                        {[0, 1, 2, 3].map((optIdx) => (
+                          <div key={optIdx} className="flex items-center space-x-1.5">
+                            <input
+                              type="radio"
+                              name={`correct-${qIdx}`}
+                              checked={qForms[qIdx].correctIndex === optIdx}
+                              onChange={() => updateQForm(qIdx, 'correctIndex', optIdx)}
+                              title="Mark as correct answer"
+                              className="accent-[#ff6b8b] cursor-pointer"
+                            />
+                            <input
+                              type="text"
+                              required
+                              value={qForms[qIdx].options[optIdx]}
+                              onChange={(e) => updateQOption(qIdx, optIdx, e.target.value)}
+                              placeholder={`Choice ${['A', 'B', 'C', 'D'][optIdx]}`}
+                              className="w-full px-2.5 py-1.5 rounded-lg bg-[#0b090f] border border-[#ff6b8b]/20 text-xs text-[#f3e7c4] focus:outline-none focus:border-[#ff6b8b]"
+                            />
+                          </div>
+                        ))}
+                      </div>
+
+                      <div>
+                        <input
+                          type="text"
+                          value={qForms[qIdx].memoryDetail}
+                          onChange={(e) => updateQForm(qIdx, 'memoryDetail', e.target.value)}
+                          placeholder="Memory Detail / Explanation (revealed when answered)"
+                          className="w-full px-3 py-1.5 rounded-xl bg-[#0b090f] border border-[#ff6b8b]/20 text-xs text-[#c8bfab] focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              <div className="flex justify-end space-x-2 pt-4 border-t border-[#ff6b8b]/20">
+              <div className="flex justify-end space-x-2 pt-4 border-t border-[#ff6b8b]/20 shrink-0">
                 <button
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}

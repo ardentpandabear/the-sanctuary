@@ -47,7 +47,7 @@ export const LittleThingsScreen: React.FC<LittleThingsScreenProps> = ({
     onAddLittleThing({
       category,
       title,
-      subtitle: subtitle || 'A quiet favorite',
+      subtitle: subtitle || '',
       details,
       addedBy,
       iconName: category,

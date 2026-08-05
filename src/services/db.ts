@@ -14,7 +14,7 @@ function parseRow<T>(row: any): T {
 export async function getTableData<T extends { id: string }>(
   table: string, 
   fallback: T[], 
-  shouldSeed: boolean = true
+  shouldSeed: boolean = false
 ): Promise<T[]> {
   const localKey = `sanctuary_${table}`;
 

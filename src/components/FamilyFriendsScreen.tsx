@@ -68,13 +68,11 @@ export const FamilyFriendsScreen: React.FC<FamilyFriendsScreenProps> = ({
     onAddContact({
       name,
       relation,
-      avatarUrl: avatarUrl || (belongsTo === 'sofs' 
-        ? 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=400' 
-        : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400'),
+      avatarUrl: avatarUrl || '',
       phone,
-      location: location || (belongsTo === 'sofs' ? 'Allahabad, India' : 'Birmingham, UK'),
-      birthday: birthday || 'January 01',
-      favoriteThings: favoriteThingsInput ? favoriteThingsInput.split(',').map(f => f.trim()) : ['Masala Chai', 'Books'],
+      location: location || '',
+      birthday: birthday || '',
+      favoriteThings: favoriteThingsInput ? favoriteThingsInput.split(',').map(f => f.trim()) : [],
       notes,
       type,
       belongsTo,
